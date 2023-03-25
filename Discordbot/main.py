@@ -11,7 +11,7 @@ import music
 import basic
 
 def setuplogs():
-    os.makedirs(r'C:\Users\Victor\Desktop\Projects\Discordbot\logs', exist_ok=True)
+    os.makedirs(r'..\Discordbot\logs', exist_ok=True)
 
     formatter = logging.Formatter('%(asctime)s %(levelname)s:%(name)s %(message)s', '%Y-%m-%d %H:%M:%S')
 
@@ -37,7 +37,7 @@ async def command_error(ctx, exc):
 async def main():
     setuplogs()
 
-    f = open(r'C:\Users\Victor\Desktop\Projects\Discordbot\token.txt', 'r')
+    f = open(r'..\Discordbot\token.txt', 'r')
     token = f.read()
     prefixes = commands.when_mentioned_or('!')
     description = "Shademare24 Simp Bot :^)"
