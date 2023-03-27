@@ -20,6 +20,7 @@ class basicplugin(commands.Cog):
 
     @commands.command()
     async def add(self, ctx, *args):
+        '''Addition'''
         totalsum = 0
         #print(type(totalsum))
         for num in args:
@@ -30,7 +31,17 @@ class basicplugin(commands.Cog):
         await ctx.send(totalsum)
 
     @commands.command()
+    async def sub(self, ctx, *args):
+        '''Subtraction'''
+        totaldiff = 0
+        for num in args:
+            convertedStrToFloat = float(num)
+            totaldiff += convertedStrToFloat
+        await ctx.send(totaldiff)
+
+    @commands.command()
     async def mul(self, ctx, *args):
+        '''Multiplication'''
         totalproduct = 1
         for num in args:
             convertedStrToFloat = float(num)
@@ -38,12 +49,20 @@ class basicplugin(commands.Cog):
         await ctx.send(totalproduct)
 
     @commands.command()
+    async def div(self, ctx, top:float, bot:float):
+        '''Division'''
+        solution = top / bot
+        await ctx.send(solution)
+
+    @commands.command()
     async def exp(self, ctx, base:float, exponent:float):
+        '''Exponents'''
         solution = base ** exponent
         await ctx.send(solution)
 
     @commands.command()
     async def watch(self, ctx):
+        '''Gives a random vtuber to watch'''
         vtuber, vtuberurl = random.choice(vtubers)
         await ctx.send("vtuber: " + vtuber)
         await ctx.send("vtuber url: " + vtuberurl)
@@ -51,4 +70,10 @@ class basicplugin(commands.Cog):
 
     @commands.command(name="clearstatus")
     async def clearstat(self, ctx):
+        '''Clears bot status'''
         await self.bot.change_presence(activity=None, status=None)
+
+    @commands.command(name="shademare12")
+    async def shademare12(self, ctx):
+        '''I'm Back'''
+        await ctx.send("https://tenor.com/view/imback-imbackbitch-springam-gif-21929800")

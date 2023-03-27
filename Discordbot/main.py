@@ -10,20 +10,6 @@ import admin
 import music
 import basic
 
-def setuplogs():
-    os.makedirs(r'..\Discordbot\logs', exist_ok=True)
-
-    formatter = logging.Formatter('%(asctime)s %(levelname)s:%(name)s %(message)s', '%Y-%m-%d %H:%M:%S')
-
-    filehandler = logging.handlers.TimedRotatingFileHandler("logs.txt", when='midnight')
-    filehandler.setLevel(logging.INFO)
-    filehandler.setFormatter(formatter)
-
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[filehandler]
-    )
-
 async def command_error(ctx, exc):
     exc_type = type(exc)
     if exc_type in [commands.BadArgument, commands.MissingRequiredArgument]:
@@ -35,9 +21,7 @@ async def command_error(ctx, exc):
             return
 
 async def main():
-    setuplogs()
-
-    f = open(r'..\Discordbot\token.txt', 'r')
+    f = open(r'C:\Users\Victor\Desktop\Projects\Discordbot\token.txt', 'r')
     token = f.read()
     prefixes = commands.when_mentioned_or('!')
     description = "Shademare24 Simp Bot :^)"
