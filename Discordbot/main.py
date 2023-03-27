@@ -21,7 +21,7 @@ async def command_error(ctx, exc):
             return
 
 async def main():
-    f = open(r'C:\Users\Victor\Desktop\Projects\Discordbot\token.txt', 'r')
+    f = open(r'...\Discordbot\token.txt', 'r')
     token = f.read()
     prefixes = commands.when_mentioned_or('!')
     description = "Shademare24 Simp Bot :^)"
