@@ -30,7 +30,7 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.command(name='link')
     async def authlink(self, ctx):
-        f = open(r'C:\Users\Victor\Desktop\Projects\Discordbot\authlink.txt', 'r')
+        f = open(r'...\Discordbot\authlink.txt', 'r')
         clientid = f.read()
         link = discord.utils.oauth_url(clientid)
         await ctx.send(link)
