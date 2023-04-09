@@ -44,7 +44,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
 
-    def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = .5):
+    def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = .25):
         super().__init__(source, volume)
 
         self.requester = ctx.author
@@ -182,7 +182,7 @@ class VoiceState:
         self.songs = SongQueue()
 
         self._loop = False
-        self._volume = 0.5
+        self._volume = 0.25
         self.skip_votes = set()
 
         self.audio_player = bot.loop.create_task(self.audio_player_task())
@@ -325,7 +325,7 @@ class musicplugin(commands.Cog):
         await ctx.voice_state.stop()
         del self.voice_states[ctx.guild.id]
 
-    @commands.command(name='volume')
+    @commands.command(name='volume', aliases=['vol'])
     async def _volume(self, ctx: commands.Context, *, volume: int):
         """Sets the volume of the player."""
 
@@ -339,6 +339,13 @@ class musicplugin(commands.Cog):
         ctx.voice_state.current.source.volume = volume / 100
         ctx.voice_state.voice.source.volume = volume / 100
         await ctx.send('Volume of the player set to {}%'.format(volume))
+
+    @commands.command(name='currentvolume', aliases=["cvol"])
+    async def checkvol(self, ctx,):
+        """Returns current volume level"""
+
+        vol = ctx.voice_state.current.source.volume * 100
+        await ctx.send('Current Volume of player is {}%'.format(vol))
 
     @commands.command(name='now', aliases=['current', 'playing'])
     async def _now(self, ctx: commands.Context):
@@ -406,7 +413,7 @@ class musicplugin(commands.Cog):
         else:
             await ctx.send('You have already voted to skip this song.')
 
-    @commands.command(name='queue')
+    @commands.command(name='queue', aliases=['que', 'q'])
     async def _queue(self, ctx: commands.Context, *, page: int = 1):
         """Shows the player's queue.
         You can optionally specify the page to show. Each page contains 10 elements.
@@ -484,6 +491,8 @@ class musicplugin(commands.Cog):
 
                 await ctx.voice_state.songs.put(song)
                 await ctx.send('Enqueued {}'.format(str(source)))
+                vol = ctx.voice_state.current.source.volume * 100
+                await ctx.send('Current Volume of player is {}%'.format(vol))
 
     @_join.before_invoke
     @_play.before_invoke

@@ -1,9 +1,7 @@
 import discord
-import os
-import sys
-import asyncio
 from discord.ext import commands
 import random
+import re
 
 vtubers = [["Omaru Polka", "https://www.youtube.com/@OmaruPolka"], ["Ceres Fauna", "https://www.youtube.com/@CeresFauna"], ["Nanashi Mumei", "https://www.youtube.com/@NanashiMumei"], ["Usada Pekora", "https://www.youtube.com/@UsadaPekora"], ["Sakamata Chloe", "https://www.youtube.com/@SakamataChloe"],
            ["Laplus Darknesss", "https://www.youtube.com/@LaplusDarknesss"], ["Hakui Koyori", "https://www.youtube.com/@HakuiKoyori"], ["Yukihana Lamy", "https://www.youtube.com/@YukihanaLamy"], ["Momosuzu Nene", "https://www.youtube.com/@MomosuzuNene"], ["Shishiro Botan", "https://www.youtube.com/@ShishiroBotan"],
@@ -36,7 +34,7 @@ class basicplugin(commands.Cog):
         totaldiff = 0
         for num in args:
             convertedStrToFloat = float(num)
-            totaldiff += convertedStrToFloat
+            totaldiff -= convertedStrToFloat
         await ctx.send(totaldiff)
 
     @commands.command()
@@ -77,3 +75,44 @@ class basicplugin(commands.Cog):
     async def shademare12(self, ctx):
         '''I'm Back'''
         await ctx.send("https://tenor.com/view/imback-imbackbitch-springam-gif-21929800")
+
+    @commands.command(name="pekofy")
+    async def pekofy(self, ctx):
+        '''Peko!'''
+        channel = ctx.channel
+        messages = [message async for message in channel.history(limit=2)]
+        recentmsg = messages[1].content
+        output = ''
+        punctuation = re.compile(r"[.?!]")
+        for x in range(len(recentmsg)):
+            if punctuation.match(recentmsg[x]):
+                temp = " peko" + recentmsg[x]
+                output += temp
+            elif x == len(recentmsg)-1:
+                temp = recentmsg[x] + " peko"
+                output += temp
+            else:
+                output += recentmsg[x]
+        await ctx.send(output)
+
+    #@commands.command(name="loopbug")
+    #tests if bot can call its own commands. results: it will not loop
+    #async def testloop(self,ctx):
+    #    await ctx.send("!loopbug")
+
+    @commands.command(name="echo")
+    async def echo(self, ctx, *args):
+        output = ''
+        for message in args:
+            output += message
+        await ctx.send(output)
+
+    @commands.command(name="goodbot")
+    async def gudbot(self, ctx):
+        await ctx.send("Arigato peko! {}".format(ctx.message.author.mention))
+        await ctx.send("https://tenor.com/view/pekora-usada-pekora-ogey-rrat-rrat-hololive-gif-24283304")
+
+    @commands.command(name="badbot")
+    async def badbot(self, ctx):
+        await ctx.send("Faq you peko! {}".format(ctx.message.author.mention))
+        await ctx.send("https://tenor.com/view/hololive-vtuber-usada-pekora-crazy-usagi-laser-gif-16904860")

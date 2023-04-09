@@ -1,9 +1,8 @@
 import discord
-import os
 import sys
 from discord.ext import commands, tasks
 import discord.utils
-import time
+import os, sys
 
 class adminplugin(commands.Cog):
     def __init__(self, bot):
@@ -30,9 +29,7 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.command(name='link')
     async def authlink(self, ctx):
-        f = open(r'...\Discordbot\authlink.txt', 'r')
+        f = open(os.path.join(sys.path[0], "authlink.txt"), "r")
         clientid = f.read()
         link = discord.utils.oauth_url(clientid)
         await ctx.send(link)
-
-    
