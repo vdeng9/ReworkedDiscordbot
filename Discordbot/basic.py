@@ -80,8 +80,8 @@ class basicplugin(commands.Cog):
     async def pekofy(self, ctx):
         '''Peko!'''
         channel = ctx.channel
-        messages = [message async for message in channel.history(limit=2)]
-        recentmsg = messages[1].content
+        message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        recentmsg = message.content
         output = ''
         punctuation = re.compile(r"[.?!]")
         for x in range(len(recentmsg)):
@@ -109,10 +109,13 @@ class basicplugin(commands.Cog):
 
     @commands.command(name="goodbot")
     async def gudbot(self, ctx):
+        '''Compliment the bot :^)'''
         await ctx.send("Arigato peko! {}".format(ctx.message.author.mention))
         await ctx.send("https://tenor.com/view/pekora-usada-pekora-ogey-rrat-rrat-hololive-gif-24283304")
 
     @commands.command(name="badbot")
     async def badbot(self, ctx):
+        '''Insult the bot :^('''
         await ctx.send("Faq you peko! {}".format(ctx.message.author.mention))
         await ctx.send("https://tenor.com/view/hololive-vtuber-usada-pekora-crazy-usagi-laser-gif-16904860")
+

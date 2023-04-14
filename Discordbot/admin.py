@@ -17,6 +17,7 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.command(name='shutdown')
     async def shutdown(self, ctx):
+        '''Shuts down the bot'''
         await ctx.send("shutting down...")
         sys.exit("shutting down")
 
@@ -29,7 +30,20 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.command(name='link')
     async def authlink(self, ctx):
+        '''Gets authentication link for joining servers'''
         f = open(os.path.join(sys.path[0], "authlink.txt"), "r")
         clientid = f.read()
         link = discord.utils.oauth_url(clientid)
         await ctx.send(link)
+
+    @commands.is_owner()
+    @commands.command(name='dlimg')
+    async def dlimg(self, ctx):
+        '''Downloads images from a channel'''
+        image_types = ["png", "jpeg", "gif", "jpg"]
+        channel = ctx.channel
+        async for message in channel.history():
+            for attachment in message.attachments:
+                if any(attachment.filename.lower().endswith(image) for image in image_types):
+                    await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
+        await ctx.send("done!")
