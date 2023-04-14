@@ -42,8 +42,12 @@ class adminplugin(commands.Cog):
         '''Downloads images from a channel'''
         image_types = ["png", "jpeg", "gif", "jpg"]
         channel = ctx.channel
-        async for message in channel.history():
-            for attachment in message.attachments:
-                if any(attachment.filename.lower().endswith(image) for image in image_types):
-                    await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
-        await ctx.send("done!")
+        if os.path.exists(os.path.join(sys.path[0], f"downloaded")):
+            async for message in channel.history():
+                for attachment in message.attachments:
+                    if any(attachment.filename.lower().endswith(image) for image in image_types):
+                        await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
+            await ctx.send("done!")
+        else:
+            os.makedirs(os.path.join(sys.path[0], f"downloaded"))
+            await ctx.send("download folder location was missing, try again")
