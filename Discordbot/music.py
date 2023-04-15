@@ -250,7 +250,7 @@ class VoiceState:
         if self.voice:
             await self.voice.disconnect()
             self.voice = None
-
+            self.current = None
 
 class musicplugin(commands.Cog):
     def __init__(self, bot):
@@ -389,9 +389,11 @@ class musicplugin(commands.Cog):
     @commands.command(name='skip')
     async def _skip(self, ctx: commands.Context):
         """Vote to skip a song. The requester can automatically skip.
-        2 skip votes are needed for the song to be skipped.
+        50% skip votes are needed for the song to be skipped.
         """
-        nskip = 2
+        channel = ctx.voice_client.channel
+        members = channel.members
+        nskip = int(int((len(members)) - 1) / 2)
 
         if not ctx.voice_state.is_playing:
             return await ctx.send('Not playing any music right now...')

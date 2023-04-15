@@ -79,9 +79,12 @@ class basicplugin(commands.Cog):
     @commands.command(name="pekofy")
     async def pekofy(self, ctx):
         '''Peko!'''
-        channel = ctx.channel
-        message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        recentmsg = message.content
+        if ctx.message.reference is not None:
+            message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            recentmsg = message.content
+        else:
+            message = [message async for message in ctx.channel.history(limit=2)]
+            recentmsg = message[1].content
         output = ''
         punctuation = re.compile(r"[.?!]")
         for x in range(len(recentmsg)):
@@ -102,6 +105,7 @@ class basicplugin(commands.Cog):
 
     @commands.command(name="echo")
     async def echo(self, ctx, *args):
+        '''Echos input'''
         output = ''
         for message in args:
             output += message
@@ -118,4 +122,3 @@ class basicplugin(commands.Cog):
         '''Insult the bot :^('''
         await ctx.send("Faq you peko! {}".format(ctx.message.author.mention))
         await ctx.send("https://tenor.com/view/hololive-vtuber-usada-pekora-crazy-usagi-laser-gif-16904860")
-
