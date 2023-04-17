@@ -1,8 +1,10 @@
 import discord
 import sys
-from discord.ext import commands, tasks
+from discord.ext import commands
 import discord.utils
-import os, sys
+import os
+import re
+import asyncio
 
 class adminplugin(commands.Cog):
     def __init__(self, bot):
@@ -40,14 +42,48 @@ class adminplugin(commands.Cog):
     @commands.command(name='dlimg')
     async def dlimg(self, ctx):
         '''Downloads images from a channel'''
-        image_types = ["png", "jpeg", "gif", "jpg"]
+        image_types = ["png", "jpeg", "gif", "jpg", "mp4", "mov"]
         channel = ctx.channel
-        if os.path.exists(os.path.join(sys.path[0], f"downloaded")):
+        if os.path.exists(os.path.join(sys.path[0], "downloaded")):
+            await ctx.send("downloading...")
             async for message in channel.history():
                 for attachment in message.attachments:
                     if any(attachment.filename.lower().endswith(image) for image in image_types):
                         await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
             await ctx.send("done!")
         else:
-            os.makedirs(os.path.join(sys.path[0], f"downloaded"))
+            os.makedirs(os.path.join(sys.path[0], "downloaded"))
             await ctx.send("download folder location was missing, try again")
+
+    @commands.is_owner()
+    @commands.command(name="delmsg")
+    async def delmsg(self, ctx, limit:int):
+        '''Deletes messages (runtime seems like its exponential don't delete too much at once)'''
+        #yayreplies = re.compile(r"^(?:y(?:es)?|1)$") cant use regex for some reason :(
+        #nayreplies = re.compile(r"^(?:n(?:o)?|1)$")
+        res = "" 
+        await ctx.send("are you sure? yes or no")
+        try:
+            res = await self.bot.wait_for('message', timeout=20.0)
+        except asyncio.TimeoutError:
+            await ctx.send("no response")
+        else:
+            if res.content.lower() == "yes":
+                await ctx.send("dont send messages while deleting is in process or dont idc tbh <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186> this is very slow tho wait for confirmation \"deleted x message(s)\" message <:PepelaughW:674427223574446092>")
+                await asyncio.sleep(3)
+                deleted = await ctx.channel.purge(limit=limit+4, bulk=True)
+                await ctx.send(f"deleted {len(deleted)-4} message(s)")
+            elif res.content.lower() == "no":
+                await ctx.send("ok...")
+            else:
+                await ctx.send("something happened idk try again <:PepelaughW:674427223574446092>")
+
+    @commands.is_owner()
+    @commands.command(name="spam")
+    async def spammsg(self, ctx, limit:int):
+        '''Opposite of delete'''
+        counter = 0
+        while counter < limit:
+            counter = counter+1
+            await ctx.send(counter)
+            
