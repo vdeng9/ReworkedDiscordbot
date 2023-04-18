@@ -58,7 +58,7 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.command(name="delmsg")
     async def delmsg(self, ctx, limit:int):
-        '''Deletes messages (runtime seems like its exponential don't delete too much at once)'''
+        '''Deletes messages'''
         #yayreplies = re.compile(r"^(?:y(?:es)?|1)$") cant use regex for some reason :(
         #nayreplies = re.compile(r"^(?:n(?:o)?|1)$")
         res = "" 
@@ -68,12 +68,12 @@ class adminplugin(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send("no response")
         else:
-            if res.content.lower() == "yes":
+            if res.content.lower() == "yes" and res.author == ctx.author:
                 await ctx.send("dont send messages while deleting is in process or dont idc tbh <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186> this is very slow tho wait for confirmation \"deleted x message(s)\" message <:PepelaughW:674427223574446092>")
-                await asyncio.sleep(3)
+                await asyncio.sleep(5)
                 deleted = await ctx.channel.purge(limit=limit+4, bulk=True)
                 await ctx.send(f"deleted {len(deleted)-4} message(s)")
-            elif res.content.lower() == "no":
+            elif res.content.lower() == "no" and res.author == ctx.author:
                 await ctx.send("ok...")
             else:
                 await ctx.send("something happened idk try again <:PepelaughW:674427223574446092>")
