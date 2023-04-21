@@ -62,18 +62,22 @@ class adminplugin(commands.Cog):
         #yayreplies = re.compile(r"^(?:y(?:es)?|1)$") cant use regex for some reason :(
         #nayreplies = re.compile(r"^(?:n(?:o)?|1)$")
         res = "" 
+        
+        def check(m):
+            return m.author == ctx.author
+        
         await ctx.send("are you sure? yes or no")
         try:
-            res = await self.bot.wait_for('message', timeout=20.0)
+            res = await self.bot.wait_for('message', timeout=20.0, check=check)
         except asyncio.TimeoutError:
             await ctx.send("no response")
         else:
-            if res.content.lower() == "yes" and res.author == ctx.author:
+            if res.content.lower() == "yes":
                 await ctx.send("dont send messages while deleting is in process or dont idc tbh <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186> this is very slow tho wait for confirmation \"deleted x message(s)\" message <:PepelaughW:674427223574446092>")
                 await asyncio.sleep(5)
                 deleted = await ctx.channel.purge(limit=limit+4, bulk=True)
                 await ctx.send(f"deleted {len(deleted)-4} message(s)")
-            elif res.content.lower() == "no" and res.author == ctx.author:
+            elif res.content.lower() == "no":
                 await ctx.send("ok...")
             else:
                 await ctx.send("something happened idk try again <:PepelaughW:674427223574446092>")
