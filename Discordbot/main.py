@@ -6,6 +6,7 @@ import os, sys
 import admin
 import music
 import basic
+import league
 
 async def command_error(ctx, exc):
     exc_type = type(exc)
@@ -32,6 +33,7 @@ async def main():
         await bot.add_cog(basic.basicplugin(bot))
         await bot.add_cog(admin.adminplugin(bot))
         await bot.add_cog(music.musicplugin(bot))
+        await bot.add_cog(league.leagueplugin(bot))
         await bot.start(token)
     #bot.run(token)
 

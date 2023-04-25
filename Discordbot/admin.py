@@ -44,16 +44,30 @@ class adminplugin(commands.Cog):
         '''Downloads images from a channel'''
         image_types = ["png", "jpeg", "gif", "jpg", "mp4", "mov"]
         channel = ctx.channel
-        if os.path.exists(os.path.join(sys.path[0], "downloaded")):
-            await ctx.send("downloading...")
-            async for message in channel.history():
-                for attachment in message.attachments:
-                    if any(attachment.filename.lower().endswith(image) for image in image_types):
-                        await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
-            await ctx.send("done!")
+        def check(m):
+            return m.author == ctx.author
+        
+        await ctx.send("are you sure? yes or no")
+        try:
+            res = await self.bot.wait_for('message', timeout=20.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.send("no response")
         else:
-            os.makedirs(os.path.join(sys.path[0], "downloaded"))
-            await ctx.send("download folder location was missing, try again")
+            if res.content.lower() == "yes": 
+                if os.path.exists(os.path.join(sys.path[0], "downloaded")):
+                    await ctx.send("downloading...")
+                    async for message in channel.history():
+                        for attachment in message.attachments:
+                            if any(attachment.filename.lower().endswith(image) for image in image_types):
+                                await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
+                    await ctx.send("done!")
+                else:
+                    os.makedirs(os.path.join(sys.path[0], "downloaded"))
+                    await ctx.send("download folder location was missing, try again")
+            elif res.content.lower() == "no":
+                await ctx.send("ok...")
+            else:
+                await ctx.send("something happened idk try again <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186>")
 
     @commands.is_owner()
     @commands.command(name="delmsg")
