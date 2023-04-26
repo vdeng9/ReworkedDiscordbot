@@ -125,7 +125,7 @@ class basicplugin(commands.Cog):
 
     @commands.command(name="weather", aliases=["w"])
     async def weatherapi(self, ctx, lat, long):
-        '''Get weather using lat and long (no more than 4 decimal places idk y it dont work and i dont wanna fix it)'''
+        '''Get weather using lat and long (no more than 4 decimal places and US only)'''
         weatherurl = "https://api.weather.gov/points/" + lat + ',' + long
         #await ctx.send(weatherurl) #check url is created correctly (works)
         reponse = requests.get(weatherurl)
