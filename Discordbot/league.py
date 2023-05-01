@@ -31,7 +31,7 @@ class leagueplugin(commands.Cog):
 
     @commands.command(name='summoner')
     async def getsummoner(self, ctx, summoner):
-        '''For now gets summoner level of a summoner'''
+        '''Gets summoner level of a summoner'''
         baselink = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'
         apilink = '?api_key=' + apikey
         fullurl = baselink + summoner + apilink
@@ -44,3 +44,37 @@ class leagueplugin(commands.Cog):
             await ctx.send(f"summoner level of {summoner} is " + str(responseJSON['summonerLevel']))
 
         await self.bot.change_presence(activity=discord.Game(name="League Of Legends"))
+
+    @commands.command(name="mastery")
+    async def masterypts(self, ctx, summoner):
+        '''Gets top 5 champions based on mastery pts'''
+        sumlink = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'
+        apilink = '?api_key=' + apikey
+        sumfullurl = sumlink + summoner + apilink
+        response = requests.get(sumfullurl)
+        sumresponseJSON = response.json()
+        summonerid = sumresponseJSON['id']
+        #await ctx.send(summonerid)
+        masterylink = "https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/"
+        masteryfulllink = masterylink + summonerid + apilink
+        #await ctx.send(masteryfulllink)
+        masteryres = requests.get(masteryfulllink)
+        masteryresJSON = masteryres.json()
+        #https://riot-api-libraries.readthedocs.io/en/latest/ddragon.html championid to champion name conversion
+        output = {}
+        x = 0
+        ddVersionControl = "https://ddragon.leagueoflegends.com/api/versions.json"
+        ddVCRes = requests.get(ddVersionControl)
+        ddVCResJSON = ddVCRes.json()
+        currentVersion = ddVCResJSON[0]
+        #await ctx.send(currentVersion)
+        ddurl = f"http://ddragon.leagueoflegends.com/cdn/{currentVersion}/data/en_US/champion.json"
+        #await ctx.send(ddurl)
+        ddResJSON = requests.get(ddurl).json()
+        while x < 5:
+            for champion in ddResJSON['data']:
+                #await ctx.send(champion)
+                if ddResJSON['data'][champion]['key'] == str(masteryresJSON[x]['championId']):
+                    output[ddResJSON['data'][champion]['id'] + ", " + ddResJSON['data'][champion]['title']] = masteryresJSON[x]['championPoints']
+                    x += 1
+        await ctx.send(output)

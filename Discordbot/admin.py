@@ -104,4 +104,3 @@ class adminplugin(commands.Cog):
         while counter < limit:
             counter = counter+1
             await ctx.send(counter)
-            

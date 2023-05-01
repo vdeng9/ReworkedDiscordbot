@@ -5,7 +5,8 @@ import re, os, sys, requests
 
 vtubers = [["Omaru Polka", "https://www.youtube.com/@OmaruPolka"], ["Ceres Fauna", "https://www.youtube.com/@CeresFauna"], ["Nanashi Mumei", "https://www.youtube.com/@NanashiMumei"], ["Usada Pekora", "https://www.youtube.com/@UsadaPekora"], ["Sakamata Chloe", "https://www.youtube.com/@SakamataChloe"],
            ["Laplus Darknesss", "https://www.youtube.com/@LaplusDarknesss"], ["Hakui Koyori", "https://www.youtube.com/@HakuiKoyori"], ["Yukihana Lamy", "https://www.youtube.com/@YukihanaLamy"], ["Momosuzu Nene", "https://www.youtube.com/@MomosuzuNene"], ["Shishiro Botan", "https://www.youtube.com/@ShishiroBotan"],
-           ["Kazama Iroha", "https://www.youtube.com/@KazamaIroha"], ["Gawr Gura", "https://www.youtube.com/@GawrGura"], ["Watson Amelia", "https://www.youtube.com/@WatsonAmelia"], ["Minato Aqua", "https://www.youtube.com/@MinatoAqua"], ["Shirakami Fubuki", "https://www.youtube.com/@ShirakamiFubuki"]]
+           ["Kazama Iroha", "https://www.youtube.com/@KazamaIroha"], ["Gawr Gura", "https://www.youtube.com/@GawrGura"], ["Watson Amelia", "https://www.youtube.com/@WatsonAmelia"], ["Minato Aqua", "https://www.youtube.com/@MinatoAqua"], ["Shirakami Fubuki", "https://www.youtube.com/@ShirakamiFubuki"],
+           ["AZKi", "https://www.youtube.com/@AZKi"]]
 
 class basicplugin(commands.Cog):
     def __init__(self, bot):
@@ -59,12 +60,25 @@ class basicplugin(commands.Cog):
         await ctx.send(solution)
 
     @commands.command()
-    async def watch(self, ctx):
+    async def watch(self, ctx, vtuberindex: int = None):
         '''Gives a random vtuber to watch'''
-        vtuber, vtuberurl = random.choice(vtubers)
+        if vtuberindex is None:
+            vtuber, vtuberurl = random.choice(vtubers)
+        else:
+            vtuber, vtuberurl = vtubers[vtuberindex]
         await ctx.send("vtuber: " + vtuber)
         await ctx.send("vtuber url: " + vtuberurl)
         await self.bot.change_presence(activity=discord.Activity(name=vtuber, type=discord.ActivityType.watching, url=vtuberurl), status="dnd")
+
+    @commands.command()
+    async def watchindex(self, ctx):
+        '''Returns index of watch'''
+        vtuberindex = 0
+        response = ""
+        while len(vtubers) > vtuberindex:
+            response += str(vtuberindex) + ": " + str(vtubers[vtuberindex][0]) + "\n"
+            vtuberindex += 1
+        await ctx.send(response)
 
     @commands.command(name="clearstatus")
     async def clearstat(self, ctx):
