@@ -78,3 +78,4 @@ class leagueplugin(commands.Cog):
                     output[ddResJSON['data'][champion]['id'] + ", " + ddResJSON['data'][champion]['title']] = masteryresJSON[x]['championPoints']
                     x += 1
         await ctx.send(output)
+        await self.bot.change_presence(activity=discord.Game(name="League Of Legends"))
