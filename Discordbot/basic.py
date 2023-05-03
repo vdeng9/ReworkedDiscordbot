@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import random
 import re, os, sys, requests
@@ -11,7 +12,7 @@ vtubers = [["Omaru Polka", "https://www.youtube.com/@OmaruPolka"], ["Ceres Fauna
 class basicplugin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
+    
     @commands.is_owner()
     @commands.command(name='basictest')
     async def test(self, ctx):
@@ -163,3 +164,22 @@ class basicplugin(commands.Cog):
             forecast_data.append(column)
         await ctx.send(city + ", " + state)
         await ctx.send(str(forecast_data))
+
+    @commands.command()
+    async def ping(self, ctx):
+        '''Gets Bot latency'''
+        ping = f"{str(round(self.bot.latency * 1000))} ms"
+        await ctx.send(ping)
+
+    @commands.command(name='imposter')
+    async def sus(self, ctx, member: discord.Member, *messages):
+        '''Sussy ඞ'''
+        output = ''
+        for message in messages:
+            output += message + " "
+        webhook = await ctx.channel.create_webhook(name=member.name)
+        await webhook.send(str(output), username=member.name, avatar_url=member.avatar.url)
+
+        webhooks = await ctx.channel.webhooks()
+        for webhook in webhooks:
+            await webhook.delete()
