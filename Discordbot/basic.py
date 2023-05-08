@@ -177,8 +177,8 @@ class basicplugin(commands.Cog):
         output = ''
         for message in messages:
             output += message + " "
-        webhook = await ctx.channel.create_webhook(name=member.name)
-        await webhook.send(str(output), username=member.name, avatar_url=member.avatar.url)
+        webhook = await ctx.channel.create_webhook(name=member.display_name)
+        await webhook.send(str(output), username=member.display_name, avatar_url=member.display_avatar.url)
 
         webhooks = await ctx.channel.webhooks()
         for webhook in webhooks:

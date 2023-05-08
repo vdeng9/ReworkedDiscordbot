@@ -9,6 +9,11 @@ import requests
 
 opentxt = open(os.path.join(sys.path[0], "lolapitoken.txt"), "r")
 apikey = opentxt.read()
+ddVersionControl = "https://ddragon.leagueoflegends.com/api/versions.json"
+ddvcJSON = requests.get(ddVersionControl).json()
+currentVersion = ddvcJSON[0]
+ddurl = f"http://ddragon.leagueoflegends.com/cdn/{currentVersion}/data/en_US/champion.json"
+ddResJSON = requests.get(ddurl).json()
 
 class leagueplugin(commands.Cog):
     def __init__(self, bot):
@@ -77,5 +82,20 @@ class leagueplugin(commands.Cog):
                 if ddResJSON['data'][champion]['key'] == str(masteryresJSON[x]['championId']):
                     output[ddResJSON['data'][champion]['id'] + ", " + ddResJSON['data'][champion]['title']] = masteryresJSON[x]['championPoints']
                     x += 1
+        await ctx.send(output)
+        await self.bot.change_presence(activity=discord.Game(name="League Of Legends"))
+
+    @commands.command(name="freechamps")
+    async def freechampions(self, ctx):
+        '''Gets the free to play champion rotation'''
+        champurl = "https://na1.api.riotgames.com/lol/platform/v3/champion-rotations"
+        apilink = '?api_key=' + apikey
+        fullurl = champurl + apilink
+        champJSON = requests.get(fullurl).json()
+        output = ''
+        for freechamps in champJSON['freeChampionIds']:
+            for champions in ddResJSON['data']:
+                if ddResJSON['data'][champions]['key'] == str(freechamps):
+                    output += ddResJSON['data'][champions]['id'] + ", " + ddResJSON['data'][champions]['title'] + "\n"
         await ctx.send(output)
         await self.bot.change_presence(activity=discord.Game(name="League Of Legends"))

@@ -26,7 +26,7 @@ async def main():
     intents = discord.Intents.all()
     activity = discord.Game(name="League of Legends")
 
-    bot = commands.Bot(command_prefix=prefixes, description=description, intents=intents, activity=activity)
+    bot = commands.Bot(command_prefix=prefixes, description=description, intents=intents, activity=activity, case_insensitive=True)
     bot.on_command_error = command_error
 
     async with bot:
