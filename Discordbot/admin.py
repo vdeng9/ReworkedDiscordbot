@@ -34,7 +34,7 @@ class adminplugin(commands.Cog):
     @commands.command(name='link')
     async def authlink(self, ctx):
         '''Gets authentication link for joining servers'''
-        f = open(os.path.join(sys.path[0], "authlink.txt"), "r")
+        f = open(os.path.join(sys.path[0], "textfiles\\authlink.txt"), "r")
         clientid = f.read()
         link = discord.utils.oauth_url(clientid)
         await ctx.send(link)
@@ -148,7 +148,34 @@ class adminplugin(commands.Cog):
     async def sqldblocator(self, ctx, dbname: str):
         '''Locates a database'''
         testing_channel = self.bot.get_channel(1088649684358266892)
-        conn = sqlite3.connect(f"{dbname}.db")
-        fileloc = conn.execute("PRAGMA database_list;").fetchall()[0][2]
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\{dbname}.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\{dbname}.db"))
+            fileloc = conn.execute("PRAGMA database_list;").fetchall()[0][2]
+            await testing_channel.send(fileloc)
+        else:
+            await testing_channel.send("database missing")
         conn.close()
-        await testing_channel.send(fileloc)
+
+    @commands.is_owner()
+    @commands.command(name='delsqldb')
+    async def deletesqldatabase(self, ctx, dbname: str):
+        '''Deletes sql database'''
+        def check(m):
+            return m.author == ctx.author
+        
+        await ctx.send("are you sure? yes or no")
+        try:
+            res = await self.bot.wait_for('message', timeout=20.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.send("no response")
+        else:
+            if res.content.lower() == "yes": 
+                if os.path.exists(os.path.join(sys.path[0], f"databases\\{dbname}.db")):
+                    os.remove(os.path.join(sys.path[0], f"databases\\{dbname}.db"))
+                    await ctx.send(f"{dbname}, removed")
+                else:
+                    await ctx.send("Database doesn't exist")
+            elif res.content.lower() == "no":
+                await ctx.send("ok...")
+            else:
+                await ctx.send("something happened idk try again <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186>")

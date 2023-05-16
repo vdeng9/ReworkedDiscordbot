@@ -19,7 +19,7 @@ async def command_error(ctx, exc):
             return
 
 async def main():
-    f = open(os.path.join(sys.path[0], "token.txt"), "r")
+    f = open(os.path.join(sys.path[0], "textfiles\\token.txt"), "r")
     token = f.read()
     prefixes = commands.when_mentioned_or('!')
     description = "Shademare24 Simp Bot :^)"

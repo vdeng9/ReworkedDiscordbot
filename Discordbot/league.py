@@ -7,7 +7,7 @@ import re
 import asyncio
 import requests
 
-opentxt = open(os.path.join(sys.path[0], "lolapitoken.txt"), "r")
+opentxt = open(os.path.join(sys.path[0], "textfiles\\lolapitoken.txt"), "r")
 apikey = opentxt.read()
 ddVersionControl = "https://ddragon.leagueoflegends.com/api/versions.json"
 ddvcJSON = requests.get(ddVersionControl).json()
