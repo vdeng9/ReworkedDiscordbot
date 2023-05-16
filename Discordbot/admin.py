@@ -3,9 +3,10 @@ import sys
 from discord.ext import commands
 import discord.utils
 import os
-import re
+import string
 import asyncio
 import sqlite3
+import random
 
 class adminplugin(commands.Cog):
     def __init__(self, bot):
@@ -41,12 +42,16 @@ class adminplugin(commands.Cog):
 
     @commands.is_owner()
     @commands.command(name='dlimg')
-    async def dlimg(self, ctx):
+    async def dlimg(self, ctx, randomize: int = None):
         '''Downloads images from a channel'''
         image_types = ["png", "jpeg", "gif", "jpg", "mp4", "mov"]
         channel = ctx.channel
         def check(m):
             return m.author == ctx.author
+        
+        def genrngname(length):
+            characters = string.ascii_letters + string.digits
+            return "".join(random.choice(characters) for _ in range(length))
         
         await ctx.send("are you sure? yes or no")
         try:
@@ -60,7 +65,11 @@ class adminplugin(commands.Cog):
                     async for message in channel.history():
                         for attachment in message.attachments:
                             if any(attachment.filename.lower().endswith(image) for image in image_types):
-                                await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
+                                if randomize is None:
+                                    await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
+                                else:
+                                    rngfilename = genrngname(randomize)
+                                    await attachment.save(os.path.join(sys.path[0], f"downloaded\{rngfilename}.{attachment.filename.split('.')[-1]}"))
                     await ctx.send("done!")
                 else:
                     os.makedirs(os.path.join(sys.path[0], "downloaded"))
