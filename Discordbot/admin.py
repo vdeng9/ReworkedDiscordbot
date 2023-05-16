@@ -5,6 +5,7 @@ import discord.utils
 import os
 import re
 import asyncio
+import sqlite3
 
 class adminplugin(commands.Cog):
     def __init__(self, bot):
@@ -104,3 +105,50 @@ class adminplugin(commands.Cog):
         while counter < limit:
             counter = counter+1
             await ctx.send(counter)
+
+    @commands.is_owner()
+    @commands.command(name='a')
+    async def say(self, ctx, channel:int, *messages):
+        targetChannel = self.bot.get_channel(channel)
+        output = ""
+        for message in messages:
+            output += message + " "
+        await targetChannel.send(output)
+
+    @commands.is_owner()
+    @commands.command(name='mksqldb')
+    async def makesqldatabase(self, ctx, dbname: str):
+        '''Creates empty sql database'''
+        def check(m):
+            return m.author == ctx.author
+        
+        await ctx.send("are you sure? yes or no")
+        try:
+            res = await self.bot.wait_for('message', timeout=20.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.send("no response")
+        else:
+            #TODO CONSIDER ADDING DUPE CHECK TO PREVENT OVERWRITING DB 
+            if res.content.lower() == "yes": 
+                if os.path.exists(os.path.join(sys.path[0], "databases")):
+                    conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\{dbname}.db"))
+                    conn.commit()
+                    conn.close()
+                    await ctx.send(f"Database: {dbname}, created.")
+                else:
+                    os.makedirs(os.path.join(sys.path[0], "databases"))
+                    await ctx.send("database folder location was missing, try again")
+            elif res.content.lower() == "no":
+                await ctx.send("ok...")
+            else:
+                await ctx.send("something happened idk try again <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186>")
+
+    @commands.is_owner()
+    @commands.command(name="sqldbloc")
+    async def sqldblocator(self, ctx, dbname: str):
+        '''Locates a database'''
+        testing_channel = self.bot.get_channel(1088649684358266892)
+        conn = sqlite3.connect(f"{dbname}.db")
+        fileloc = conn.execute("PRAGMA database_list;").fetchall()[0][2]
+        conn.close()
+        await testing_channel.send(fileloc)
