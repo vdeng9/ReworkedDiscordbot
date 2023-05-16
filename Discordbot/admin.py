@@ -46,6 +46,7 @@ class adminplugin(commands.Cog):
         '''Downloads images from a channel'''
         image_types = ["png", "jpeg", "gif", "jpg", "mp4", "mov"]
         channel = ctx.channel
+        incrementalname = 0
         def check(m):
             return m.author == ctx.author
         
@@ -67,6 +68,9 @@ class adminplugin(commands.Cog):
                             if any(attachment.filename.lower().endswith(image) for image in image_types):
                                 if randomize is None:
                                     await attachment.save(os.path.join(sys.path[0], f"downloaded\{attachment.filename}"))
+                                elif randomize == 99:
+                                    await attachment.save(os.path.join(sys.path[0], f"downloaded\{incrementalname}.{attachment.filename.split('.')[-1]}"))
+                                    incrementalname += 1
                                 else:
                                     rngfilename = genrngname(randomize)
                                     await attachment.save(os.path.join(sys.path[0], f"downloaded\{rngfilename}.{attachment.filename.split('.')[-1]}"))
