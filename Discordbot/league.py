@@ -99,3 +99,28 @@ class leagueplugin(commands.Cog):
                     output += ddResJSON['data'][champions]['id'] + ", " + ddResJSON['data'][champions]['title'] + "\n"
         await ctx.send(output)
         await self.bot.change_presence(activity=discord.Game(name="League Of Legends"))
+
+    @commands.command(name="champstats")
+    async def championstats(self, ctx, champname: str):
+        '''Gets Champion Stats (some champs don't work idk y...)'''
+        output = ""
+        offrole = "None" # default if singular role
+        for champ in ddResJSON['data']:
+            if champname.lower() == str(champ).lower():
+                #print(champname + "|" + champ) check name comparison is correct
+                name = ddResJSON['data'][champ]['name']
+                title = ddResJSON['data'][champ]['title']
+                blurb = ddResJSON['data'][champ]['blurb']
+                x = 0 # counts how many roles a champ has
+                for role in ddResJSON['data'][champ]['tags']:
+                    #print(str(x) + "|" + str(role)) check rolenum to role 0|mage, 1|tank, etc...
+                    if x == 0: 
+                        mainrole = role
+                    if x == 1:
+                        offrole = role
+                    x += 1
+                resourcetype = ddResJSON['data'][champ]['partype']
+                for stats in ddResJSON['data'][champ]['stats']:
+                    output += str(stats) + ": " + str(ddResJSON['data'][champ]['stats'][stats]) + "\n"
+                await ctx.send("Name: " + name + "\nTitle: " + title + "\nLore: " + blurb + "\nMainrole: " + mainrole + "\nOffrole: " + offrole + "\nResourcetype: " + resourcetype)
+                await ctx.send("Stats: \n" + output)
