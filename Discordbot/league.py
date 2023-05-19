@@ -122,5 +122,5 @@ class leagueplugin(commands.Cog):
                 resourcetype = ddResJSON['data'][champ]['partype']
                 for stats in ddResJSON['data'][champ]['stats']:
                     output += str(stats) + ": " + str(ddResJSON['data'][champ]['stats'][stats]) + "\n"
-                await ctx.send("Name: " + name + "\nTitle: " + title + "\nLore: " + blurb + "\nMainrole: " + mainrole + "\nOffrole: " + offrole + "\nResourcetype: " + resourcetype)
-                await ctx.send("Stats: \n" + output)
+                await ctx.send("Name: " + name + "\nTitle: " + title + "\nLore: " + blurb + "\nMainrole: " + mainrole + "\nOffrole: " + offrole + "\nResourcetype: " + resourcetype + "\nStats: \n" + output)
+                await self.bot.change_presence(activity=discord.Game(name="League Of Legends"))

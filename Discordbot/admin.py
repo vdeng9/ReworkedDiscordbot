@@ -192,3 +192,21 @@ class adminplugin(commands.Cog):
                 await ctx.send("ok...")
             else:
                 await ctx.send("something happened idk try again <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186>")
+
+    @commands.is_owner()
+    @commands.command(name="mkreviewtable")
+    async def makesqltable(self, ctx, dbname:str):
+        '''Create review table in database'''
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\{dbname}.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\{dbname}.db"))
+            cursor = conn.cursor()
+            mktablequery = '''CREATE TABLE botreview (review TEXT, score INTEGER)'''
+            insertquery = '''INSERT INTO botreview VALUES (?,?)'''
+            insertdata = [("good", 0), ("bad", 0)]
+            cursor.execute(mktablequery)
+            cursor.executemany(insertquery, insertdata)
+            conn.commit()
+            conn.close()
+            await ctx.send("done")
+        else:
+            await ctx.send("missing Database")

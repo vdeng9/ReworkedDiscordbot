@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 import random
-import re, os, sys, requests
+import re, os, sys, requests, sqlite3
 
 vtubers = [["Omaru Polka", "https://www.youtube.com/@OmaruPolka"], ["Ceres Fauna", "https://www.youtube.com/@CeresFauna"], ["Nanashi Mumei", "https://www.youtube.com/@NanashiMumei"], ["Usada Pekora", "https://www.youtube.com/@UsadaPekora"], ["Sakamata Chloe", "https://www.youtube.com/@SakamataChloe"],
            ["Laplus Darknesss", "https://www.youtube.com/@LaplusDarknesss"], ["Hakui Koyori", "https://www.youtube.com/@HakuiKoyori"], ["Yukihana Lamy", "https://www.youtube.com/@YukihanaLamy"], ["Momosuzu Nene", "https://www.youtube.com/@MomosuzuNene"], ["Shishiro Botan", "https://www.youtube.com/@ShishiroBotan"],
@@ -126,17 +126,54 @@ class basicplugin(commands.Cog):
             output += message + " "
         await ctx.send(output)
 
+    @commands.cooldown(1, 60, commands.BucketType.user)
     @commands.command(name="goodbot")
     async def gudbot(self, ctx):
         '''Compliment the bot :^)'''
-        await ctx.send("Arigato peko! {}".format(ctx.message.author.mention))
-        await ctx.send("https://tenor.com/view/pekora-usada-pekora-ogey-rrat-rrat-hololive-gif-24283304")
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\review.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\review.db"))
+            cursor = conn.cursor()
+            updatequery = '''UPDATE botreview SET score = score + 1 WHERE review = "good"'''
+            cursor.execute(updatequery)
+            conn.commit()
+            conn.close()
+            await ctx.send("Arigato peko! {}".format(ctx.message.author.mention))
+            await ctx.send("https://tenor.com/view/pekora-usada-pekora-ogey-rrat-rrat-hololive-gif-24283304")
+        else:
+            await ctx.send("Missing database")
 
+    @commands.cooldown(1, 60, commands.BucketType.user)
     @commands.command(name="badbot")
     async def badbot(self, ctx):
         '''Insult the bot :^('''
-        await ctx.send("Faq you peko! {}".format(ctx.message.author.mention))
-        await ctx.send("https://tenor.com/view/hololive-vtuber-usada-pekora-crazy-usagi-laser-gif-16904860")
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\review.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\review.db"))
+            cursor = conn.cursor()
+            updatequery = '''UPDATE botreview SET score = score + 1 WHERE review = "bad"'''
+            cursor.execute(updatequery)
+            conn.commit()
+            conn.close()
+            await ctx.send("Faq you peko! {}".format(ctx.message.author.mention))
+            await ctx.send("https://tenor.com/view/hololive-vtuber-usada-pekora-crazy-usagi-laser-gif-16904860")
+        else:
+            await ctx.send("Missing database")
+
+    @commands.command(name="botreview")
+    async def getreviews(self, ctx):
+        '''Get the bots review scores'''
+        output = ''
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\review.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\review.db"))
+            cursor = conn.cursor()
+            cursor.execute('''SELECT * FROM botreview''')
+            results = cursor.fetchall()
+            conn.close()
+            embed = discord.Embed(title="Bot Statistics", description="How good or how bad <:suske:1108942794900373544> the bot is doing")
+            embed.add_field(name=results[0][0], value=results[0][1])
+            embed.add_field(name=results[1][0], value=results[1][1])
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("Missing database")
 
     @commands.command(name="weather", aliases=["w"])
     async def weatherapi(self, ctx, lat, long):
