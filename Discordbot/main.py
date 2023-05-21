@@ -34,6 +34,7 @@ async def main():
         await bot.add_cog(admin.adminplugin(bot))
         await bot.add_cog(music.musicplugin(bot))
         await bot.add_cog(league.leagueplugin(bot))
+        #TODO add economy cog when its made
         await bot.start(token)
     #bot.run(token)
 

@@ -210,3 +210,22 @@ class adminplugin(commands.Cog):
             await ctx.send("done")
         else:
             await ctx.send("missing Database")
+
+    @commands.is_owner()
+    @commands.command(name="rigged")
+    async def riggedgoodbot(self, ctx):
+        '''Rigs bot review scores'''
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\review.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\review.db"))
+            cursor = conn.cursor()
+            cursor.execute('''SELECT * FROM botreview''')
+            numbad = cursor.fetchall()
+            updatequery = f'''UPDATE botreview SET score = score + {numbad[1][1]} WHERE review = "good"'''
+            cursor.execute(updatequery)
+            conn.commit()
+            conn.close()
+            await ctx.send("https://media.discordapp.net/attachments/722594694898647102/1045179474649554944/ezgif-5-a797348fe1.gif")
+        else:
+            await ctx.send("Missing Database")
+
+    

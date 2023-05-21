@@ -102,7 +102,7 @@ class leagueplugin(commands.Cog):
 
     @commands.command(name="champstats")
     async def championstats(self, ctx, champname: str):
-        '''Gets Champion Stats (some champs don't work idk y...)'''
+        '''Gets Champion Stats'''
         output = ""
         offrole = "None" # default if singular role
         for champ in ddResJSON['data']:
