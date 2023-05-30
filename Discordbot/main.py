@@ -3,10 +3,7 @@ import asyncio
 from discord.ext import commands
 import os, sys
 
-import admin
-import music
-import basic
-import league
+import admin, music, basic, league, economy
 
 async def command_error(ctx, exc):
     exc_type = type(exc)
@@ -34,7 +31,7 @@ async def main():
         await bot.add_cog(admin.adminplugin(bot))
         await bot.add_cog(music.musicplugin(bot))
         await bot.add_cog(league.leagueplugin(bot))
-        #TODO add economy cog when its made
+        await bot.add_cog(economy.economyplugin(bot))
         await bot.start(token)
     #bot.run(token)
 

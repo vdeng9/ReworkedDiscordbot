@@ -228,4 +228,17 @@ class adminplugin(commands.Cog):
         else:
             await ctx.send("Missing Database")
 
-    
+    @commands.is_owner()
+    @commands.command(name="mkecontable")
+    async def makeecontable(self, ctx, dbname:str):
+        '''Create economy table in database'''
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\{dbname}.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\{dbname}.db"))
+            cursor = conn.cursor()
+            mktablequery = '''CREATE TABLE economy (id INTEGER, pekos INTEGER)'''
+            cursor.execute(mktablequery)
+            conn.commit()
+            conn.close()
+            await ctx.send("done")
+        else:
+            await ctx.send("missing Database")
