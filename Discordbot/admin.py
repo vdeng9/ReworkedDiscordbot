@@ -246,6 +246,23 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.cooldown(1, 7*24*60*60)
     @commands.command(name="cd")
-    async def testcd(self, ctx):
+    async def testcd(self, ctx, test = None):
         '''Cooldown error tester'''
-        await ctx.send("not on cd")
+        if test is None:
+            await ctx.send("not on cd")
+        else:
+            ctx.command.reset_cooldown(ctx)
+            await ctx.send("no cd applied")
+
+    @commands.is_owner()
+    @commands.command(name="rmme")
+    async def removemefromeconomy(self, ctx):
+        '''Removes Me from economy system for debugging purposes'''
+        discID = ctx.message.author.id
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''DELETE FROM economy WHERE id = {discID}''')
+            conn.commit()
+            conn.close()
+            await ctx.send(f"{discID} removed")

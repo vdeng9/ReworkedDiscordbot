@@ -51,23 +51,37 @@ class economyplugin(commands.Cog):
     async def daily(self, ctx):
         '''Daily pekos'''
         discID = ctx.message.author.id
+        x = 0
         #print(discID)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
-            cursor.execute(f'''UPDATE economy SET pekos = pekos + 50 WHERE id = {discID}''')
-            conn.commit()
-            conn.close()
-            pekosembed = discord.Embed(title="Daily", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
-            pekosembed.add_field(name="pekos",value="+50")
-            await ctx.send(embed=pekosembed)
+            cursor.execute('''SELECT id FROM economy''')
+            results = cursor.fetchall()
+            #print(len(results))
+            for x in range(len(results)):
+                if discID == results[x][0]: 
+                    cursor.execute(f'''UPDATE economy SET pekos = pekos + 50 WHERE id = {discID}''')
+                    conn.commit()
+                    conn.close()
+                    pekosembed = discord.Embed(title="Daily", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
+                    pekosembed.add_field(name="pekos",value="+50")
+                    await ctx.send(embed=pekosembed)
+                    break
+                elif x >= len(results)-1:
+                    await ctx.send("You might not be registered")
+                    ctx.command.reset_cooldown(ctx)
+            #print(x)
         else:
             await ctx.send("Missing database")
 
     @commands.command(name='checkpekos')
-    async def checkpekos(self, ctx):
+    async def checkpekos(self, ctx, member: discord.User = None):
         '''Checks how much pekos you have'''
-        discID = ctx.message.author.id
+        if member is None:
+            discID = ctx.message.author.id
+        else:
+            discID = member.id
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
