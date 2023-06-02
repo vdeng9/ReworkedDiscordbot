@@ -21,7 +21,7 @@ class economyplugin(commands.Cog):
     async def registation(self, ctx):
         '''Registers user to the Shademare12 economy system'''
         discID = ctx.message.author.id # discord IDs are unique as of rn 5/30/23
-        print(f"register was called by {discID}")
+        #print(f"register was called by {discID}")
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             x = 0
             registeredcheck = False 
@@ -39,14 +39,47 @@ class economyplugin(commands.Cog):
                 cursor.executemany('INSERT INTO economy VALUES (?,?)', [(discID, 50)])
                 conn.commit()
                 await ctx.send("you are now registered here is 50 pekos to start off with <:PekoSmug:797748881642356756>")
-            cursor.execute('''SELECT id FROM economy''')
-            results = cursor.fetchall()
-            print("results:" + str(results))
+            #cursor.execute('''SELECT id FROM economy''')
+            #results = cursor.fetchall()
+            #print("results:" + str(results))
             conn.close()
         else:
             await ctx.send("Missing database")
 
-    #no longer needed but ima keep it incase future testing is need for watever reason
+    @commands.cooldown(1, 24*60*60, commands.BucketType.user)
+    @commands.command(name='daily')
+    async def daily(self, ctx):
+        '''Daily pekos'''
+        discID = ctx.message.author.id
+        #print(discID)
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''UPDATE economy SET pekos = pekos + 50 WHERE id = {discID}''')
+            conn.commit()
+            conn.close()
+            pekosembed = discord.Embed(title="Daily", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
+            pekosembed.add_field(name="pekos",value="+50")
+            await ctx.send(embed=pekosembed)
+        else:
+            await ctx.send("Missing database")
+
+    @commands.command(name='checkpekos')
+    async def checkpekos(self, ctx):
+        '''Checks how much pekos you have'''
+        discID = ctx.message.author.id
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''SELECT pekos FROM economy WHERE id = {discID}''')
+            result = cursor.fetchall()
+            pekosembed = discord.Embed(title="Check", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
+            pekosembed.add_field(name="pekos", value=result[0][0])
+            await ctx.send(embed=pekosembed)
+        else:
+            await ctx.send("Missing database")
+
+    #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()
     #@commands.command()
     #async def testuser(self, ctx):

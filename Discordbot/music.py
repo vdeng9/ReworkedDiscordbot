@@ -472,7 +472,7 @@ class musicplugin(commands.Cog):
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
 
-    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.cooldown(1, 5, commands.BucketType.guild) # should prevent same time !play calls
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
         """Plays a song.

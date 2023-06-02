@@ -242,3 +242,10 @@ class adminplugin(commands.Cog):
             await ctx.send("done")
         else:
             await ctx.send("missing Database")
+
+    @commands.is_owner()
+    @commands.cooldown(1, 7*24*60*60)
+    @commands.command(name="cd")
+    async def testcd(self, ctx):
+        '''Cooldown error tester'''
+        await ctx.send("not on cd")

@@ -1,5 +1,4 @@
 import discord
-from discord import app_commands
 from discord.ext import commands
 import random
 import re, os, sys, requests, sqlite3
@@ -168,7 +167,7 @@ class basicplugin(commands.Cog):
             cursor.execute('''SELECT * FROM botreview''')
             results = cursor.fetchall()
             conn.close()
-            embed = discord.Embed(title="Bot Statistics", description="How good or how bad <:suske:1108942794900373544> the bot is doing")
+            embed = discord.Embed(title="Bot Statistics", description="How good or how bad <:suske:1108942794900373544> the bot is doing", color=0xFF0000)
             embed.add_field(name=results[0][0], value=results[0][1])
             embed.add_field(name=results[1][0], value=results[1][1])
             await ctx.send(embed=embed)

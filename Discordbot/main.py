@@ -14,6 +14,10 @@ async def command_error(ctx, exc):
         if exc_type is commands.CommandNotFound:
             await ctx.send(str(exc))
             return
+        
+    if exc.__class__ is commands.CommandOnCooldown:
+        cd: int = int(exc.retry_after)
+        await ctx.send(f"Command is on cooldown, try again in **{cd//86400}d {(cd//3600)%24}h {(cd//60)%60}m {cd%60}s**.")
 
 async def main():
     f = open(os.path.join(sys.path[0], "textfiles\\token.txt"), "r")
