@@ -1,8 +1,8 @@
 # ReworkedDiscordbot
 Personal Discord bot with random features I felt like adding
 # Libraries
--discord.py
--ytdlp
+-discord.py <br>
+-ytdlp <br>
 -Internal Python libraries
 # APIs
 -Riot Games
