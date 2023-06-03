@@ -75,6 +75,7 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
+    @commands.cooldown(1,3,commands.BucketType.user)
     @commands.command(name='pekos')
     async def checkpekos(self, ctx, member: discord.User = None):
         '''Checks how much pekos you have or someone else has'''
@@ -93,6 +94,7 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
+    @commands.cooldown(1, 3, commands.BucketType.user)
     @commands.command(name='gamba')
     async def gamba(self, ctx, amount: int):
         discID = ctx.message.author.id
@@ -142,7 +144,6 @@ class economyplugin(commands.Cog):
                             break
                 elif x >= len(results)-1:
                     await ctx.send("You might not be registered")
-                    ctx.command.reset_cooldown(ctx)
         else:
             await ctx.send("Missing database")
 
