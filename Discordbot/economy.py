@@ -105,6 +105,7 @@ class economyplugin(commands.Cog):
         '''Gamble your pekos'''
         discID = ctx.message.author.id
         x = 0
+        startAmount = amount
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
@@ -124,7 +125,7 @@ class economyplugin(commands.Cog):
                             cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                             conn.commit()
                             conn.close()
-                            await ctx.send(f"You won {2*amount}!!!")
+                            await ctx.send(f"You won {2*startAmount}!!!")
                             break
                         else:
                             cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
@@ -139,7 +140,7 @@ class economyplugin(commands.Cog):
                             cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                             conn.commit()
                             conn.close()
-                            await ctx.send(f"You won {3*amount}!!!")
+                            await ctx.send(f"You won {3*startAmount}!!!")
                             break
                         else:
                             cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
