@@ -144,6 +144,7 @@ class economyplugin(commands.Cog):
                             break
                 elif x >= len(results)-1:
                     await ctx.send("You might not be registered")
+                    ctx.command.reset_cooldown(ctx)
         else:
             await ctx.send("Missing database")
 
