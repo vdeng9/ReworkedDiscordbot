@@ -52,6 +52,8 @@ class economyplugin(commands.Cog):
         '''Daily pekos'''
         discID = ctx.message.author.id
         x = 0
+        discUser = await self.bot.fetch_user(discID)
+        #print(discUser)
         #print(discID)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
@@ -66,6 +68,7 @@ class economyplugin(commands.Cog):
                     conn.close()
                     pekosembed = discord.Embed(title="Daily", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
                     pekosembed.add_field(name="pekos",value="+50")
+                    pekosembed.set_author(name=str(discUser))
                     await ctx.send(embed=pekosembed)
                     break
                 elif x >= len(results)-1:
@@ -83,6 +86,7 @@ class economyplugin(commands.Cog):
             discID = ctx.message.author.id
         else:
             discID = member.id
+        discUser = await self.bot.fetch_user(discID)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
@@ -90,6 +94,7 @@ class economyplugin(commands.Cog):
             result = cursor.fetchall()
             pekosembed = discord.Embed(title="Check", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
             pekosembed.add_field(name="pekos", value=result[0][0])
+            pekosembed.set_author(name=str(discUser))
             await ctx.send(embed=pekosembed)
         else:
             await ctx.send("Missing database")
@@ -97,6 +102,7 @@ class economyplugin(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     @commands.command(name='gamba')
     async def gamba(self, ctx, amount: int):
+        '''Gamble your pekos'''
         discID = ctx.message.author.id
         x = 0
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -115,11 +121,10 @@ class economyplugin(commands.Cog):
                     if amount <= 50:
                         wincon = random.randint(1,100)
                         if wincon >= 50:
-                            amount *= 2
                             cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                             conn.commit()
                             conn.close()
-                            await ctx.send(f"You won {amount}!!!")
+                            await ctx.send(f"You won {2*amount}!!!")
                             break
                         else:
                             cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
@@ -130,11 +135,11 @@ class economyplugin(commands.Cog):
                     elif amount > 50:
                         wincon = random.randint(1,100)
                         if wincon >= 90:
-                            amount *= 3
+                            amount *= 2
                             cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                             conn.commit()
                             conn.close()
-                            await ctx.send(f"You won {amount}!!!")
+                            await ctx.send(f"You won {3*amount}!!!")
                             break
                         else:
                             cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
@@ -147,6 +152,21 @@ class economyplugin(commands.Cog):
                     ctx.command.reset_cooldown(ctx)
         else:
             await ctx.send("Missing database")
+
+    @commands.command(name="lb")
+    async def leaderboard(self, ctx):
+        '''Leaderboard'''
+        x = 0
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute('''SELECT * FROM economy ORDER BY pekos DESC''')
+            results = cursor.fetchall()
+            resultembed = discord.Embed(title="Leaderboard")
+            while x < len(results):
+                resultembed.add_field(name=str(await self.bot.fetch_user(results[x][0])), value=f"{results[x][1]} pekos", inline=False)
+                x += 1
+            await ctx.send(embed=resultembed)
 
     #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()
