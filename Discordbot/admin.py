@@ -266,3 +266,19 @@ class adminplugin(commands.Cog):
             conn.commit()
             conn.close()
             await ctx.send(f"{discID} removed")
+        else:
+            await ctx.send("Missing database")
+
+    @commands.is_owner()
+    @commands.command(name="giveme")
+    async def givemepekos(self, ctx, amount: int):
+        '''Gives Me pekos for debugging or rigging purposes'''
+        discID = ctx.message.author.id
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+            conn.commit()
+            conn.close()
+        else:
+            await ctx.send("Missing database")

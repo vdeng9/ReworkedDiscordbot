@@ -75,9 +75,9 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.command(name='checkpekos')
+    @commands.command(name='pekos')
     async def checkpekos(self, ctx, member: discord.User = None):
-        '''Checks how much pekos you have'''
+        '''Checks how much pekos you have or someone else has'''
         if member is None:
             discID = ctx.message.author.id
         else:
@@ -90,6 +90,59 @@ class economyplugin(commands.Cog):
             pekosembed = discord.Embed(title="Check", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
             pekosembed.add_field(name="pekos", value=result[0][0])
             await ctx.send(embed=pekosembed)
+        else:
+            await ctx.send("Missing database")
+
+    @commands.command(name='gamba')
+    async def gamba(self, ctx, amount: int):
+        discID = ctx.message.author.id
+        x = 0
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute('''SELECT * FROM economy''')
+            results = cursor.fetchall()
+            for x in range(len(results)):
+                if discID == results[x][0]: 
+                    if amount > results[x][1]:
+                        await ctx.send("You don't have enough pekos")
+                        break
+                    if amount < 1:
+                        await ctx.send("Can't bet zero or negative pekos")
+                        break
+                    if amount <= 50:
+                        wincon = random.randint(1,100)
+                        if wincon >= 50:
+                            amount *= 2
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You won {amount}!!!")
+                            break
+                        else:
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You lost {amount}!!!")
+                            break
+                    elif amount > 50:
+                        wincon = random.randint(1,100)
+                        if wincon >= 90:
+                            amount *= 3
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You won {amount}!!!")
+                            break
+                        else:
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You lost {amount}!!!")
+                            break
+                elif x >= len(results)-1:
+                    await ctx.send("You might not be registered")
+                    ctx.command.reset_cooldown(ctx)
         else:
             await ctx.send("Missing database")
 
