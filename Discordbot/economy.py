@@ -4,7 +4,7 @@ from discord.ext import commands
 import discord.utils
 import os
 import string
-import asyncio
+import requests
 import sqlite3
 import random
 
@@ -171,6 +171,7 @@ class economyplugin(commands.Cog):
 
     @commands.command(name="give")
     async def givepekos(self, ctx, receiver: discord.User, amount: int):
+        '''Gives pekos to someone'''
         discID = ctx.message.author.id
         rdiscID = receiver.id
         discName = await self.bot.fetch_user(discID)
@@ -194,6 +195,35 @@ class economyplugin(commands.Cog):
                 conn.commit()
                 conn.close()
                 await ctx.send(f"{discName.mention} gave {receiver.mention} {amount} pekos")
+        else:
+            await ctx.send("Missing database")
+
+    @commands.cooldown(1,3)
+    @commands.command(name="gacha")
+    async def waifugacha(self, ctx, mode:str = None):
+        '''Roll for a waifu image 50 pekos per roll'''
+        discID = ctx.message.author.id
+        if mode is None:
+            baseurl = "http://api.waifu.im/search/?&is_nsfw=false"
+        elif mode.lower() == "nsfw":
+            baseurl = "http://api.waifu.im/search/?&is_nsfw=true"
+            if not ctx.channel.is_nsfw():
+                await ctx.send("Not a nsfw channel")
+                return
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''SELECT * FROM economy WHERE id = {discID}''')
+            results = cursor.fetchall()
+            if results[0][1] < 50:
+                await ctx.send("You do not have enough pekos")
+                return
+            cursor.execute(f'''UPDATE economy SET pekos = pekos - 50 WHERE id = {discID}''')
+            conn.commit()
+            conn.close()
+            waifuJSON = requests.get(baseurl).json()
+            waifuimage = waifuJSON['images'][0]['url']
+            await ctx.send(waifuimage)
         else:
             await ctx.send("Missing database")
 
