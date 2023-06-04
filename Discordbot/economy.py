@@ -169,6 +169,34 @@ class economyplugin(commands.Cog):
                 x += 1
             await ctx.send(embed=resultembed)
 
+    @commands.command(name="give")
+    async def givepekos(self, ctx, receiver: discord.User, amount: int):
+        discID = ctx.message.author.id
+        rdiscID = receiver.id
+        discName = await self.bot.fetch_user(discID)
+        if discID == rdiscID:
+            await ctx.send("You can't give yourself pekos")
+            return
+        if amount < 0:
+            await ctx.send("You can't give zero or negative pekos")
+            return
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''SELECT * FROM economy WHERE id = {discID}''')
+            results = cursor.fetchall()
+            #print(results)
+            if results[0][1] < amount:
+                await ctx.send(f"You don't have enough pekos to give {amount}")
+            else:
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {rdiscID}''')
+                cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                conn.commit()
+                conn.close()
+                await ctx.send(f"{discName.mention} gave {receiver.mention} {amount} pekos")
+        else:
+            await ctx.send("Missing database")
+
     #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()
     #@commands.command()
