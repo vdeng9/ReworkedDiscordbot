@@ -8,6 +8,18 @@ import requests
 import sqlite3
 import random
 
+def checkReg(discID: int):
+    if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+        x = 0
+        conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id FROM economy''')
+        results = cursor.fetchall()
+        for x in range(len(results)):
+            if discID == results[x][0]: 
+                return True
+        return False
+
 class economyplugin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -29,7 +41,7 @@ class economyplugin(commands.Cog):
             cursor = conn.cursor()
             cursor.execute('''SELECT id FROM economy''')
             results = cursor.fetchall()
-            while x < len(results):
+            while x < len(results): # TODO replace with checkReg() at some point
                 if discID == results[x][0]:
                     await ctx.send("you are already registered")
                     registeredcheck = True
@@ -84,8 +96,14 @@ class economyplugin(commands.Cog):
         '''Checks how much pekos you have or someone else has'''
         if member is None:
             discID = ctx.message.author.id
+            if not checkReg(discID=discID):
+                await ctx.send("You might not be registered")
+                return
         else:
             discID = member.id
+            if not checkReg(discID=discID):
+                await ctx.send("They might not be registered")
+                return
         discUser = await self.bot.fetch_user(discID)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
@@ -104,6 +122,9 @@ class economyplugin(commands.Cog):
     async def gamba(self, ctx, amount: int):
         '''Gamble your pekos'''
         discID = ctx.message.author.id
+        if not checkReg(discID=discID):
+            await ctx.send("You might not be registered")
+            return
         x = 0
         startAmount = amount
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -174,6 +195,12 @@ class economyplugin(commands.Cog):
         '''Gives pekos to someone'''
         discID = ctx.message.author.id
         rdiscID = receiver.id
+        if not checkReg(discID=discID):
+            await ctx.send("You might not be registered")
+            return
+        elif not checkReg(discID=rdiscID):
+            await ctx.send("The receiver might not be registered")
+            return
         discName = await self.bot.fetch_user(discID)
         if discID == rdiscID:
             await ctx.send("You can't give yourself pekos")
@@ -203,6 +230,9 @@ class economyplugin(commands.Cog):
     async def waifugacha(self, ctx, mode:str = None):
         '''Roll for a waifu image 50 pekos per roll'''
         discID = ctx.message.author.id
+        if not checkReg(discID=discID):
+            await ctx.send("You might not be registered")
+            return
         if mode is None:
             baseurl = "http://api.waifu.im/search/?&is_nsfw=false"
         elif mode.lower() == "nsfw":
@@ -226,6 +256,64 @@ class economyplugin(commands.Cog):
             await ctx.send(waifuimage)
         else:
             await ctx.send("Missing database")
+
+    @commands.cooldown(1,60,commands.BucketType.user)
+    @commands.command(name="steal")
+    async def stealpekos(self, ctx, target: discord.User, amount: int):
+        discID = ctx.message.author.id
+        tdiscID = target.id
+        discName = await self.bot.fetch_user(discID)
+        if not checkReg(discID=discID):
+            await ctx.send("You might not be registered")
+            ctx.command.reset_cooldown(ctx)
+            return
+        if not checkReg(discID=tdiscID):
+            await ctx.send("They might not be registered")
+            ctx.command.reset_cooldown(ctx)
+            return
+        stealoutcomes = ["steal", "fail", "L"]
+        stealweights = [.40, .57, .03]
+        #stealresult = random.choices(stealoutcomes, stealweights)
+        #print(stealresult)
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            x = 0
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''SELECT * FROM economy WHERE id = {discID}''')
+            initresults = cursor.fetchall()
+            cursor.execute(f'''SELECT * FROM economy WHERE id = {tdiscID}''')
+            tarresults = cursor.fetchall()
+            #print(initresults)
+            #print(tarresults)
+            if initresults[0][1] < 1:
+                await ctx.send("You must own at least 1 peko to steal")
+                ctx.command.reset_cooldown(ctx)
+                return
+            if tarresults[0][1] < 1:
+                await ctx.send("They must own at least 1 peko to steal")
+                ctx.command.reset_cooldown(ctx)
+                return
+            if amount < 10*initresults[0][1]:
+                if amount <= tarresults[0][1]:
+                    stealresult = random.choices(stealoutcomes, stealweights)
+                    #print(stealresult)
+                    if stealresult[0] == "steal":                            
+                        cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                        cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {tdiscID}''')
+                        conn.commit()
+                        conn.close()
+                        await ctx.send(f"{discName.mention} stole {amount} from {target.mention}")
+                    elif stealresult[0] == "fail":
+                        await ctx.send(f"{discName.mention} failed to steal from {target.mention} <:PepelaughW:674427223574446092>")
+                    elif stealresult[0] == "L":
+                        cursor.execute(f'''UPDATE economy SET pekos = 0 WHERE id = {discID}''')
+                        conn.commit()
+                        conn.close()
+                        await ctx.send(f"While trying to steal from {target.mention}, {discName.mention} tripped and fell dropping all their pekos <:PepelaughW:674427223574446092>")
+                else:
+                    await ctx.send(f"They do not have {amount} pekos")
+            else:
+                await ctx.send("You can't steal more than 10 times the amount of pekos you own")
 
     #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()
