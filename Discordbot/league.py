@@ -36,7 +36,8 @@ class leagueplugin(commands.Cog):
 
     @commands.command(name='summoner')
     async def getsummoner(self, ctx, summoner):
-        '''Gets summoner level of a summoner'''
+        '''Gets summoner level of a summoner
+        !summoner [summoner]'''
         baselink = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'
         apilink = '?api_key=' + apikey
         fullurl = baselink + summoner + apilink
@@ -52,7 +53,8 @@ class leagueplugin(commands.Cog):
 
     @commands.command(name="mastery")
     async def masterypts(self, ctx, summoner):
-        '''Gets top 5 champions based on mastery pts'''
+        '''Gets top 5 champions based on mastery pts
+        !mastery [summoner]'''
         sumlink = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'
         apilink = '?api_key=' + apikey
         sumfullurl = sumlink + summoner + apilink
@@ -102,7 +104,8 @@ class leagueplugin(commands.Cog):
 
     @commands.command(name="champstats")
     async def championstats(self, ctx, champname: str):
-        '''Gets Champion Stats'''
+        '''Gets Champion Stats
+        !champstats [champname]'''
         output = ""
         offrole = "None" # default if singular role
         for champ in ddResJSON['data']:

@@ -9,6 +9,7 @@ async def command_error(ctx, exc):
     exc_type = type(exc)
     if exc_type in [commands.BadArgument, commands.MissingRequiredArgument]:
         await ctx.send("Bad arguments")
+        ctx.command.reset_cooldown(ctx)
 
     if ctx.message.guild is None or ctx.prefix.startswith(ctx.bot.user.mention):
         if exc_type is commands.CommandNotFound:

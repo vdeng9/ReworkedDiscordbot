@@ -93,7 +93,8 @@ class economyplugin(commands.Cog):
     @commands.cooldown(1,3,commands.BucketType.user)
     @commands.command(name='pekos')
     async def checkpekos(self, ctx, member: discord.User = None):
-        '''Checks how much pekos you have or someone else has'''
+        '''Checks how much pekos you have or someone else has
+        !pekos | !pekos [member]'''
         if member is None:
             discID = ctx.message.author.id
             if not checkReg(discID=discID):
@@ -120,7 +121,8 @@ class economyplugin(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     @commands.command(name='gamba')
     async def gamba(self, ctx, amount: int):
-        '''Gamble your pekos'''
+        '''Gamble your pekos
+        !gamba [amount]'''
         discID = ctx.message.author.id
         if not checkReg(discID=discID):
             await ctx.send("You might not be registered")
@@ -141,7 +143,7 @@ class economyplugin(commands.Cog):
                         await ctx.send("Can't bet zero or negative pekos")
                         break
                     if amount <= 50:
-                        wincon = random.randint(1,100)
+                        wincon = random.randint(1,100) # TODO implement this better similar to steals probability
                         if wincon >= 50:
                             cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                             conn.commit()
@@ -192,7 +194,8 @@ class economyplugin(commands.Cog):
 
     @commands.command(name="give")
     async def givepekos(self, ctx, receiver: discord.User, amount: int):
-        '''Gives pekos to someone'''
+        '''Gives pekos to someone
+        !give [receiver] [amount]'''
         discID = ctx.message.author.id
         rdiscID = receiver.id
         if not checkReg(discID=discID):
@@ -228,7 +231,8 @@ class economyplugin(commands.Cog):
     @commands.cooldown(1,3)
     @commands.command(name="gacha")
     async def waifugacha(self, ctx, mode:str = None):
-        '''Roll for a waifu image 50 pekos per roll'''
+        '''Roll for a waifu image 50 pekos per roll
+        !gacha | !gacha nsfw'''
         discID = ctx.message.author.id
         if not checkReg(discID=discID):
             await ctx.send("You might not be registered")
@@ -257,9 +261,11 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.cooldown(1,60,commands.BucketType.user)
+    @commands.cooldown(1,5*60,commands.BucketType.user)
     @commands.command(name="steal")
     async def stealpekos(self, ctx, target: discord.User, amount: int):
+        '''Steal up to 10x pekos you own
+        !steal [target] [amount]'''
         discID = ctx.message.author.id
         tdiscID = target.id
         discName = await self.bot.fetch_user(discID)
@@ -293,7 +299,7 @@ class economyplugin(commands.Cog):
                 await ctx.send("They must own at least 1 peko to steal")
                 ctx.command.reset_cooldown(ctx)
                 return
-            if amount < 10*initresults[0][1]:
+            if amount <= 10*initresults[0][1]:
                 if amount <= tarresults[0][1]:
                     stealresult = random.choices(stealoutcomes, stealweights)
                     #print(stealresult)
