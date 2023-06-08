@@ -280,5 +280,6 @@ class adminplugin(commands.Cog):
             cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
             conn.commit()
             conn.close()
+            await ctx.send(f"{amount} pekos has been added for debugging or rigging purposes <:PekoSmug:797748881642356756>")
         else:
             await ctx.send("Missing database")
