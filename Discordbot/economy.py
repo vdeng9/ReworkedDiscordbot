@@ -261,7 +261,7 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.cooldown(1,5*60,commands.BucketType.user)
+    @commands.cooldown(1,10*60,commands.BucketType.user)
     @commands.command(name="steal")
     async def stealpekos(self, ctx, target: discord.User, amount: int):
         '''Steal up to 10x pekos you own
@@ -278,7 +278,7 @@ class economyplugin(commands.Cog):
             ctx.command.reset_cooldown(ctx)
             return
         stealoutcomes = ["steal", "fail", "L"]
-        stealweights = [.40, .57, .03]
+        stealweights = [.33, .60, .07]
         #stealresult = random.choices(stealoutcomes, stealweights)
         #print(stealresult)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -299,7 +299,7 @@ class economyplugin(commands.Cog):
                 await ctx.send("They must own at least 1 peko to steal")
                 ctx.command.reset_cooldown(ctx)
                 return
-            if amount <= 10*initresults[0][1]:
+            if amount <= 2*initresults[0][1]:
                 if amount <= tarresults[0][1]:
                     stealresult = random.choices(stealoutcomes, stealweights)
                     #print(stealresult)
@@ -318,8 +318,10 @@ class economyplugin(commands.Cog):
                         await ctx.send(f"While trying to steal from {target.mention}, {discName.mention} tripped and fell dropping all their pekos <:PepelaughW:674427223574446092>")
                 else:
                     await ctx.send(f"They do not have {amount} pekos")
+                    ctx.command.reset_cooldown(ctx)
             else:
-                await ctx.send("You can't steal more than 10 times the amount of pekos you own")
+                await ctx.send("You can't steal more than 2 times the amount of pekos you own")
+                ctx.command.reset_cooldown(ctx)
 
     #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()
