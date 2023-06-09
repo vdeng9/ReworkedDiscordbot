@@ -143,6 +143,9 @@ class economyplugin(commands.Cog):
             if amount > results[0][1]:
                 await ctx.send("You do not have enough pekos!!!")
                 return
+            if amount < 1:
+                await ctx.send("You can't gamble 0 or negative pekos!!!")
+                return
             await ctx.send(f"What multiplier? {multiplierOptions}")
             try:
                 res = await self.bot.wait_for('message', timeout=10.0, check=check)
@@ -295,6 +298,9 @@ class economyplugin(commands.Cog):
         if not checkReg(discID=tdiscID):
             await ctx.send("They might not be registered")
             ctx.command.reset_cooldown(ctx)
+            return
+        if discID == tdiscID:
+            await ctx.send("Can't steal from yourself....")
             return
         stealoutcomes = ["steal", "fail", "L"]
         stealweights = [.33, .60, .07]
