@@ -210,7 +210,8 @@ class economyplugin(commands.Cog):
             results = cursor.fetchall()
             resultembed = discord.Embed(title="Leaderboard")
             while x < len(results):
-                resultembed.add_field(name=str(await self.bot.fetch_user(results[x][0])), value=f"{results[x][1]} pekos", inline=False)
+                rank = x + 1
+                resultembed.add_field(name=f"#{rank} {str(await self.bot.fetch_user(results[x][0]))}", value=f"{results[x][1]} pekos", inline=False)
                 x += 1
             await ctx.send(embed=resultembed)
 
