@@ -118,7 +118,8 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.cooldown(1, 3, commands.BucketType.user)
+    rngcd = random.randint(10,20) 
+    @commands.cooldown(1, rngcd, commands.BucketType.user)
     @commands.command(name='gamba')
     async def gamba(self, ctx, amount: int):
         '''Gamble your pekos
@@ -199,7 +200,7 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.command(name="lb")
+    @commands.command(name="lb", aliases=["leaderboard"])
     async def leaderboard(self, ctx):
         '''Leaderboard'''
         x = 0
@@ -231,7 +232,7 @@ class economyplugin(commands.Cog):
         if discID == rdiscID:
             await ctx.send("You can't give yourself pekos")
             return
-        if amount < 0:
+        if amount <= 0:
             await ctx.send("You can't give zero or negative pekos")
             return
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -247,7 +248,7 @@ class economyplugin(commands.Cog):
                 cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
                 conn.commit()
                 conn.close()
-                await ctx.send(f"{discName.mention} gave {receiver.mention} {amount} pekos")
+                await ctx.send(f"{discName} gave {receiver} {amount} pekos")
         else:
             await ctx.send("Missing database")
 
@@ -267,6 +268,9 @@ class economyplugin(commands.Cog):
             if not ctx.channel.is_nsfw():
                 await ctx.send("Not a nsfw channel")
                 return
+        else:
+            await ctx.send("Bad arguments")
+            return
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
@@ -334,14 +338,14 @@ class economyplugin(commands.Cog):
                         cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {tdiscID}''')
                         conn.commit()
                         conn.close()
-                        await ctx.send(f"{discName.mention} stole {amount} from {target.mention}")
+                        await ctx.send(f"{discName} stole {amount} from {target}")
                     elif stealresult[0] == "fail":
-                        await ctx.send(f"{discName.mention} failed to steal from {target.mention} <:PepelaughW:674427223574446092>")
+                        await ctx.send(f"{discName} failed to steal from {target} <:PepelaughW:674427223574446092>")
                     elif stealresult[0] == "L":
                         cursor.execute(f'''UPDATE economy SET pekos = 0 WHERE id = {discID}''')
                         conn.commit()
                         conn.close()
-                        await ctx.send(f"While trying to steal from {target.mention}, {discName.mention} tripped and fell dropping all their pekos <:PepelaughW:674427223574446092>")
+                        await ctx.send(f"While trying to steal from {target}, {discName} tripped and fell dropping all their pekos <:PepelaughW:674427223574446092>")
                 else:
                     await ctx.send(f"They do not have {amount} pekos")
                     ctx.command.reset_cooldown(ctx)

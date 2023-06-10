@@ -283,3 +283,18 @@ class adminplugin(commands.Cog):
             await ctx.send(f"{amount} pekos has been added for debugging or rigging purposes <:PekoSmug:797748881642356756>")
         else:
             await ctx.send("Missing database")
+
+    @commands.is_owner()
+    @commands.command(name="take")
+    async def takepekos(self, ctx, user: discord.User, amount: int):
+        '''Removes pekos from a user'''
+        discID = user.id
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+            conn.commit()
+            conn.close()
+            await ctx.send(f"{amount} pekos removed")
+        else:
+            await ctx.send("Missing database")
