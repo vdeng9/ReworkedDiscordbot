@@ -1,7 +1,9 @@
 import discord
 from discord.ext import commands
-import random
-import re, os, sys, requests, sqlite3
+import requests
+import re, os, sys, random, sqlite3
+from threading import Thread
+from time import sleep
 
 vtubers = [["Omaru Polka", "https://www.youtube.com/@OmaruPolka"], ["Ceres Fauna", "https://www.youtube.com/@CeresFauna"], ["Nanashi Mumei", "https://www.youtube.com/@NanashiMumei"], ["Usada Pekora", "https://www.youtube.com/@UsadaPekora"], ["Sakamata Chloe", "https://www.youtube.com/@SakamataChloe"],
            ["Laplus Darknesss", "https://www.youtube.com/@LaplusDarknesss"], ["Hakui Koyori", "https://www.youtube.com/@HakuiKoyori"], ["Yukihana Lamy", "https://www.youtube.com/@YukihanaLamy"], ["Momosuzu Nene", "https://www.youtube.com/@MomosuzuNene"], ["Shishiro Botan", "https://www.youtube.com/@ShishiroBotan"],
@@ -66,8 +68,7 @@ class basicplugin(commands.Cog):
             vtuber, vtuberurl = random.choice(vtubers)
         else:
             vtuber, vtuberurl = vtubers[vtuberindex]
-        await ctx.send("vtuber: " + vtuber)
-        await ctx.send("vtuber url: " + vtuberurl)
+        await ctx.send(f"vtuber: {vtuber} \nvtuber url: {vtuberurl}")
         await self.bot.change_presence(activity=discord.Activity(name=vtuber, type=discord.ActivityType.watching, url=vtuberurl), status="dnd")
 
     @commands.command()

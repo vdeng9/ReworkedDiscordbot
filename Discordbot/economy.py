@@ -8,6 +8,8 @@ import requests
 import sqlite3
 import random
 import datetime
+from threading import Thread
+from time import sleep
 
 def checkReg(discID: int):
     if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -20,6 +22,18 @@ def checkReg(discID: int):
             if discID == results[x][0]: 
                 return True
         return False
+
+def startrefresher():
+    while True:
+        midnightrefresh()
+        sleep(60)
+        
+def midnightrefresh():
+    # normalize daily to reset at midnight est for all users
+    midnight = (datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0)).total_seconds()
+    return midnight
+
+Thread(target=startrefresher).start()
 
 class economyplugin(commands.Cog):
     def __init__(self, bot):
@@ -59,8 +73,8 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    # normalize daily to reset at midnight est for all users
-    midnight = (datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0)).total_seconds()
+
+    midnight = midnightrefresh()
     @commands.cooldown(1, 24*60*60 - midnight, commands.BucketType.user)
     @commands.command(name='daily')
     async def daily(self, ctx):
