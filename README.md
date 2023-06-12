@@ -3,6 +3,7 @@ Personal Discord bot with random features I felt like adding
 # Libraries
 -discord.py <br>
 -ytdlp <br>
+-requests <br>
 -Internal Python libraries <br>
 # APIs
 -Riot Games <br>
