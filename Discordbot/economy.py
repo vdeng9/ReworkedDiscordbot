@@ -33,7 +33,7 @@ def midnightrefresh():
     midnight = (datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0)).total_seconds()
     return midnight
 
-Thread(target=startrefresher).start()
+Thread(target=startrefresher).start() 
 
 class economyplugin(commands.Cog):
     def __init__(self, bot):
