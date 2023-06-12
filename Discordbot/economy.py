@@ -33,7 +33,7 @@ def midnightrefresh():
     midnight = (datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0)).total_seconds()
     return midnight
 
-Thread(target=startrefresher).start() 
+Thread(target=startrefresher).start()
 
 class economyplugin(commands.Cog):
     def __init__(self, bot):
@@ -324,7 +324,7 @@ class economyplugin(commands.Cog):
             await ctx.send("Can't steal from yourself....")
             return
         stealoutcomes = ["steal", "fail", "L"]
-        stealweights = [.33, .60, .07]
+        stealweights = [.35, .60, .05]
         #stealresult = random.choices(stealoutcomes, stealweights)
         #print(stealresult)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
