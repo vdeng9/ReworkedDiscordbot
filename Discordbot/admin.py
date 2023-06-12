@@ -8,6 +8,9 @@ import asyncio
 import sqlite3
 import random
 
+yess = ["yes", "y", "yea", "yeah", "ye", "yeh"]
+nos = ["no", "n"]
+
 class adminplugin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -60,7 +63,7 @@ class adminplugin(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send("no response")
         else:
-            if res.content.lower() == "yes": 
+            if res.content.lower() in yess: 
                 if os.path.exists(os.path.join(sys.path[0], "downloaded")):
                     await ctx.send("downloading...")
                     async for message in channel.history():
@@ -78,7 +81,7 @@ class adminplugin(commands.Cog):
                 else:
                     os.makedirs(os.path.join(sys.path[0], "downloaded"))
                     await ctx.send("download folder location was missing, try again")
-            elif res.content.lower() == "no":
+            elif res.content.lower() in nos:
                 await ctx.send("ok...")
             else:
                 await ctx.send("something happened idk try again <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186>")
@@ -100,12 +103,12 @@ class adminplugin(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send("no response")
         else:
-            if res.content.lower() == "yes":
+            if res.content.lower() in yess:
                 await ctx.send("dont send messages while deleting is in process or dont idc tbh <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186> this is very slow tho wait for confirmation \"deleted x message(s)\" message <:PepelaughW:674427223574446092>")
                 await asyncio.sleep(5)
                 deleted = await ctx.channel.purge(limit=limit+4, bulk=True)
                 await ctx.send(f"deleted {len(deleted)-4} message(s)")
-            elif res.content.lower() == "no":
+            elif res.content.lower() in nos:
                 await ctx.send("ok...")
             else:
                 await ctx.send("something happened idk try again <:PepelaughW:674427223574446092>")
@@ -256,9 +259,28 @@ class adminplugin(commands.Cog):
 
     @commands.is_owner()
     @commands.command(name="rmme")
-    async def removemefromeconomy(self, ctx):
+    async def removemefromeconomy(self, ctx, user: discord.User = None):
         '''Removes Me from economy system for debugging purposes'''
-        discID = ctx.message.author.id
+        def check(m):
+            return m.author == ctx.author
+        if user is None:
+            discID = ctx.message.author.id
+        else:
+            discID = user.id
+            await ctx.send(f"Confirm?")
+            try:
+                res = await self.bot.wait_for('message', timeout=10.0, check=check)
+            except asyncio.TimeoutError:
+                await ctx.send("no response")
+            else:
+                if res.content.lower() in yess:
+                    await ctx.send("ok")
+                elif res.content.lower() in nos:
+                    await ctx.send("jumped out")
+                    return
+                else:
+                    await ctx.send("Not a valid option")
+                    return
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()

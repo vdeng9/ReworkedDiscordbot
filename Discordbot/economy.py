@@ -7,6 +7,7 @@ import asyncio
 import requests
 import sqlite3
 import random
+import datetime
 
 def checkReg(discID: int):
     if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -58,7 +59,9 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.cooldown(1, 24*60*60, commands.BucketType.user)
+    # normalize daily to reset at midnight est for all users
+    midnight = (datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0)).total_seconds()
+    @commands.cooldown(1, 24*60*60 - midnight, commands.BucketType.user)
     @commands.command(name='daily')
     async def daily(self, ctx):
         '''Daily pekos'''
@@ -135,7 +138,6 @@ class economyplugin(commands.Cog):
         twoxweights = [.5, .5]
         threexweights = [.3, .7]
         fivexweights = [.1, .9]
-        x = 0
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
@@ -212,7 +214,7 @@ class economyplugin(commands.Cog):
             resultembed = discord.Embed(title="Leaderboard")
             while x < len(results):
                 rank = x + 1
-                resultembed.add_field(name=f"#{rank} {str(await self.bot.fetch_user(results[x][0]))}", value=f"{results[x][1]} pekos", inline=False)
+                resultembed.add_field(name=f"#{rank} {str(await self.bot.fetch_user(results[x][0]))}", value=f"{results[x][1]} pekos", inline=True)
                 x += 1
             await ctx.send(embed=resultembed)
 

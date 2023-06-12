@@ -125,7 +125,7 @@ class basicplugin(commands.Cog):
             output += message + " "
         await ctx.send(output)
 
-    @commands.cooldown(1, 60, commands.BucketType.user)
+    @commands.cooldown(1, 5*60, commands.BucketType.user)
     @commands.command(name="goodbot")
     async def gudbot(self, ctx):
         '''Compliment the bot :^)'''
@@ -141,7 +141,7 @@ class basicplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.cooldown(1, 60, commands.BucketType.user)
+    @commands.cooldown(1, 5*60, commands.BucketType.user)
     @commands.command(name="badbot")
     async def badbot(self, ctx):
         '''Insult the bot :^('''
