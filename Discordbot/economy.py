@@ -7,9 +7,6 @@ import asyncio
 import requests
 import sqlite3
 import random
-import datetime
-from threading import Thread
-from time import sleep
 
 def checkReg(discID: int):
     if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -22,18 +19,6 @@ def checkReg(discID: int):
             if discID == results[x][0]: 
                 return True
         return False
-
-def startrefresher():
-    while True:
-        midnightrefresh()
-        sleep(60)
-        
-def midnightrefresh():
-    # normalize daily to reset at midnight est for all users
-    midnight = (datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0)).total_seconds()
-    return midnight
-
-Thread(target=startrefresher).start()
 
 class economyplugin(commands.Cog):
     def __init__(self, bot):
@@ -73,9 +58,7 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-
-    midnight = midnightrefresh()
-    @commands.cooldown(1, 24*60*60 - midnight, commands.BucketType.user)
+    @commands.cooldown(1, 24*60*60, commands.BucketType.user)
     @commands.command(name='daily')
     async def daily(self, ctx):
         '''Daily pekos'''
@@ -361,7 +344,7 @@ class economyplugin(commands.Cog):
                         cursor.execute(f'''UPDATE economy SET pekos = 0 WHERE id = {discID}''')
                         conn.commit()
                         conn.close()
-                        await ctx.send(f"While trying to steal from {target}, {discName} tripped and fell dropping all their pekos <:PepelaughW:674427223574446092>")
+                        await ctx.send(f"While trying to steal from {target}, {discName} tripped and fell dropping all {initresults[0][1]} of their pekos <:PepelaughW:674427223574446092>")
                 else:
                     await ctx.send(f"They do not have {amount} pekos")
                     ctx.command.reset_cooldown(ctx)
