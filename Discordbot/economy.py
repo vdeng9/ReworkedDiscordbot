@@ -63,30 +63,26 @@ class economyplugin(commands.Cog):
     async def daily(self, ctx):
         '''Daily pekos'''
         discID = ctx.message.author.id
-        x = 0
         discUser = await self.bot.fetch_user(discID)
         #print(discUser)
         #print(discID)
+        treasurebox = [50, 100, 500, 1000, 5000, 10000]
+        boxweights = [.80625, .10, .05, .025, .0125, .00625]
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
-            cursor = conn.cursor()
-            cursor.execute('''SELECT id FROM economy''')
-            results = cursor.fetchall()
-            #print(len(results))
-            for x in range(len(results)):
-                if discID == results[x][0]: 
-                    cursor.execute(f'''UPDATE economy SET pekos = pekos + 50 WHERE id = {discID}''')
-                    conn.commit()
-                    conn.close()
-                    pekosembed = discord.Embed(title="Daily", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
-                    pekosembed.add_field(name="pekos",value="+50")
-                    pekosembed.set_author(name=str(discUser))
-                    await ctx.send(embed=pekosembed)
-                    break
-                elif x >= len(results)-1:
-                    await ctx.send("You might not be registered")
-                    ctx.command.reset_cooldown(ctx)
-            #print(x)
+            cursor = conn.cursor() 
+            if checkReg(discID):
+                amount = random.choices(treasurebox, boxweights)
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount[0]} WHERE id = {discID}''')
+                conn.commit()
+                conn.close()
+                pekosembed = discord.Embed(title="Daily", description="<:PekoSmug:797748881642356756>", color=0x80FFFF)
+                pekosembed.add_field(name="pekos",value=f"+{amount[0]}")
+                pekosembed.set_author(name=str(discUser))
+                await ctx.send(embed=pekosembed)
+            else:
+                await ctx.send("You might not be registered")
+                ctx.command.reset_cooldown(ctx)
         else:
             await ctx.send("Missing database")
 
@@ -121,7 +117,7 @@ class economyplugin(commands.Cog):
     rngcd = random.randint(10,20) 
     @commands.cooldown(1, rngcd, commands.BucketType.user)
     @commands.command(name='gamba')
-    async def gamba(self, ctx, amount: int):
+    async def gamba(self, ctx, amount: int, multiplier: str = None):
         '''Gamble your pekos
         !gamba [amount]'''
         discID = ctx.message.author.id
@@ -146,17 +142,9 @@ class economyplugin(commands.Cog):
             if amount < 1:
                 await ctx.send("You can't gamble 0 or negative pekos!!!")
                 return
-            await ctx.send(f"What multiplier? {multiplierOptions}")
-            try:
-                res = await self.bot.wait_for('message', timeout=10.0, check=check)
-            except asyncio.TimeoutError:
-                await ctx.send("no response")
-            else:
-                #print(res.content)
-                #print(type(res.content))
-                if res.content.lower() == multiplierOptions[0]:
+            if multiplier is not None:
+                if multiplier == "2x" or multiplier == "2":
                     gambaresult = random.choices(outcomes, twoxweights)
-                    #print(gambaresult[0])
                     if gambaresult[0] == "win":
                         cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                         conn.commit()
@@ -167,22 +155,15 @@ class economyplugin(commands.Cog):
                         conn.commit()
                         conn.close()
                         await ctx.send(f"You lost {amount}!!!")
-                elif res.content.lower() == multiplierOptions[1]:
+                elif multiplier == "3x" or multiplier == "3":
                     gambaresult = random.choices(outcomes, threexweights)
-                    #print(gambaresult[0])
                     if gambaresult[0] == "win":
                         cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
                         conn.commit()
                         conn.close()
                         await ctx.send(f"You won {3*amount}!!!")
-                    else:
-                        cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
-                        conn.commit()
-                        conn.close()
-                        await ctx.send(f"You lost {amount}!!!")
-                elif res.content.lower() == multiplierOptions[2]:
+                elif multiplier == "5x" or multiplier == "5":
                     gambaresult = random.choices(outcomes, fivexweights)
-                    #print(gambaresult[0])
                     if gambaresult[0] == "win":
                         cursor.execute(f'''UPDATE economy SET pekos = pekos + {4*amount} WHERE id = {discID}''')
                         conn.commit()
@@ -194,7 +175,55 @@ class economyplugin(commands.Cog):
                         conn.close()
                         await ctx.send(f"You lost {amount}!!!")
                 else:
-                    await ctx.send("Not a valid option")
+                    await ctx.send(f"Invalid Multiplier")
+            else:
+                await ctx.send(f"What multiplier? {multiplierOptions}")
+                try:
+                    res = await self.bot.wait_for('message', timeout=10.0, check=check)
+                except asyncio.TimeoutError:
+                    await ctx.send("no response")
+                else:
+                    #print(res.content)
+                    #print(type(res.content))
+                    if res.content.lower() == multiplierOptions[0] or res.content.lower() == "2":
+                        gambaresult = random.choices(outcomes, twoxweights)
+                        #print(gambaresult[0])
+                        if gambaresult[0] == "win":
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You won {2*amount}!!!")
+                        else:
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You lost {amount}!!!")
+                    elif res.content.lower() == multiplierOptions[1] or res.content.lower() == "3":
+                        gambaresult = random.choices(outcomes, threexweights)
+                        if gambaresult[0] == "win":
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You won {3*amount}!!!")
+                        else:
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You lost {amount}!!!")
+                    elif res.content.lower() == multiplierOptions[2] or res.content.lower() == "5":
+                        gambaresult = random.choices(outcomes, fivexweights)
+                        if gambaresult[0] == "win":
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos + {4*amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You won {5*amount}!!!")
+                        else:
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"You lost {amount}!!!")
+                    else:
+                        await ctx.send("Not a valid option")
             conn.close() # I dont actually know if this close is needed but its here incase it is
         else:
             await ctx.send("Missing database")

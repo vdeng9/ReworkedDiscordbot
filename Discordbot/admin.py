@@ -122,9 +122,21 @@ class adminplugin(commands.Cog):
             counter = counter+1
             await ctx.send(counter)
 
+    botchannels = [712157790751424513, 692490698955423786]
     @commands.is_owner()
-    @commands.command(name='a')
+    @commands.command()
+    async def announce(self, ctx, *messages):
+        for x in self.botchannels:
+            channel = self.bot.get_channel(x)
+            output = ''
+            for message in messages:
+                output += message + " "
+            await channel.send(output)
+
+    @commands.is_owner()
+    @commands.command(name='say')
     async def say(self, ctx, channel:int, *messages):
+        '''Makes the bot speak in specific channels'''
         targetChannel = self.bot.get_channel(channel)
         output = ""
         for message in messages:
