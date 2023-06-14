@@ -8,8 +8,8 @@ import asyncio
 import sqlite3
 import random
 
-yess = ["yes", "y", "yea", "yeah", "ye", "yeh"]
-nos = ["no", "n"]
+yess = ["yes", "y", "yea", "yeah", "ye", "yeh", "ya", "yah"]
+nos = ["no", "n", "nope", "nah"]
 
 class adminplugin(commands.Cog):
     def __init__(self, bot):

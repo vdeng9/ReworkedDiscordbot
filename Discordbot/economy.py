@@ -397,7 +397,15 @@ class economyplugin(commands.Cog):
         2 matches = 1x, 3 matches = 2x, 1 jackpot = 1x, 2 jackpot = 2x, 3 jackpot = !bank'''
         discID = ctx.message.author.id
         #test = ["<a:hutaoCash:1118473906915917935>"] # for testing 3 jackpots cuz realistically testing for it would be so rare...
-        slotschar = ["placeholder1", "placeholder2", "placeholder3", "placeholder4", "placeholder5", "<a:hutaoCash:1118473906915917935>"]
+        slotschar = ["<a:intoTheAyayaLand:1045225606352220190>", "<a:polkaSpin:797750618466287636>", "<:PekoSmug:797748881642356756>",
+                    "<:painpeko:854652380158230528>", "<:whenlifegetsscuffed:933325588003967056>", "<:FaunaStare:1074027074391646278>",
+                    "<:oddowo:741191279945449532>", "<:smadge:1039443341038850109>", "<a:rainbowpls:703162735256535120>",
+                    "<a:HazmatMutsuki:786756436964933692>", "<a:ROWOW:704438082631630988>", "<:AYAYA:649470611843710976>", 
+                    "<a:hutaoCash:1118473906915917935>"]
+        if not checkReg(discID=discID):
+            await ctx.send("You might not be registered")
+            ctx.command.reset_cooldown(ctx)
+            return
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
@@ -410,9 +418,9 @@ class economyplugin(commands.Cog):
                 await ctx.send("You can't gamble 0 or negative pekos!!!")
                 return
             cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
-            cursor.execute(f'''UPDATE bank SET pekos = pekos + {amount}''')
+            cursor.execute(f'''UPDATE bank SET pekos = pekos + {amount} WHERE id = "slots"''')
             conn.commit()
-            cursor.execute(f'''SELECT * FROM bank''')
+            cursor.execute(f'''SELECT * FROM bank WHERE id = "slots"''')
             bank = cursor.fetchall()
             #print(bank[0][0], bank[0][1])
             slotsresults = random.choices(slotschar, k=3)
@@ -424,7 +432,7 @@ class economyplugin(commands.Cog):
             if slotsresults[0] == slotsresults[1] == slotsresults[2]:
                 if slotsresults[0] == "<a:hutaoCash:1118473906915917935>":
                     cursor.execute(f'''UPDATE economy SET pekos = pekos + {bank[0][1]} WHERE id = {discID}''')
-                    cursor.execute(f'''UPDATE bank SET pekos = 0''')
+                    cursor.execute(f'''UPDATE bank SET pekos = 0 WHERE id = "slots"''')
                     conn.commit()
                     slotsembed = discord.Embed(title="Slots", description="JACKPOT!!!", color=0xFF0000)
                     slotsembed.add_field(name="pekos",value=f"+{bank[0][1]}")
@@ -459,7 +467,9 @@ class economyplugin(commands.Cog):
                 await ctx.send(embed=slotsembed)
                 await ctx.send("1 Jackpot!!! <a:umpsmug:710004835641983054>")
             else:
-                await ctx.send("Unlucky")
+                slotsembed = discord.Embed(title="Slots", description="Unlucky", color=0xFF0000)
+                slotsembed.add_field(name="pekos",value=f"+0")
+                await ctx.send(embed=slotsembed)
                 await ctx.send("<:oddoneSmug:747346231595892766>")
             conn.close()
         else:
