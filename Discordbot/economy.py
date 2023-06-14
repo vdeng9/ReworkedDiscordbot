@@ -394,7 +394,7 @@ class economyplugin(commands.Cog):
     async def slots(self, ctx, amount: int):
         '''Slots
         !slots [amount]
-        2 matches = 1x, 3 matches = 2x, 1 jackpot = 1x, 2 jackpot = 2x, 3 jackpot = !bank'''
+        2 matches = 1x, 3 matches = 5x, 1 jackpot = 1x, 2 jackpot = 3x, 3 jackpot = !bank'''
         discID = ctx.message.author.id
         #test = ["<a:hutaoCash:1118473906915917935>"] # for testing 3 jackpots cuz realistically testing for it would be so rare...
         slotschar = ["<a:intoTheAyayaLand:1045225606352220190>", "<a:polkaSpin:797750618466287636>", "<:PekoSmug:797748881642356756>",
@@ -439,17 +439,17 @@ class economyplugin(commands.Cog):
                     await ctx.send(embed=slotsembed)
                     await ctx.send("<a:hutaoCash:1118473906915917935>")
                 else:
-                    cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                    cursor.execute(f'''UPDATE economy SET pekos = pekos + {5*amount} WHERE id = {discID}''')
                     conn.commit()
                     slotsembed = discord.Embed(title="Slots", description="3 Matches!!!", color=0xFF0000)
-                    slotsembed.add_field(name="pekos",value=f"+{2*amount}")
+                    slotsembed.add_field(name="pekos",value=f"+{5*amount}")
                     await ctx.send(embed=slotsembed)
                     await ctx.send("<:Poggie:674427373440991232>")
             elif slotsresults[0] == slotsresults[1] == "<a:hutaoCash:1118473906915917935>" or slotsresults[1] == slotsresults[2] == "<a:hutaoCash:1118473906915917935>" or slotsresults[0] == slotsresults[2] == "<a:hutaoCash:1118473906915917935>":
-                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {3*amount} WHERE id = {discID}''')
                 conn.commit()
                 slotsembed = discord.Embed(title="Slots", description="2 Jackpots!!!", color=0xFF0000)
-                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
+                slotsembed.add_field(name="pekos",value=f"+{3*amount}")
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<:Poggie:674427373440991232>")
             elif slotsresults[0] == slotsresults[1] or slotsresults[1] == slotsresults[2] or slotsresults[0] == slotsresults[2]:
