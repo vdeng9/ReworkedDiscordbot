@@ -386,6 +386,94 @@ class economyplugin(commands.Cog):
             else:
                 await ctx.send("You can't steal more than 2 times the amount of pekos you own")
                 ctx.command.reset_cooldown(ctx)
+        else:
+            await ctx.send("Missing database")
+
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.command()
+    async def slots(self, ctx, amount: int):
+        '''Slots
+        !slots [amount]
+        2 matches = 1x, 3 matches = 2x, 1 jackpot = 1x, 2 jackpot = 2x, 3 jackpot = !bank'''
+        discID = ctx.message.author.id
+        #test = ["<a:hutaoCash:1118473906915917935>"] # for testing 3 jackpots cuz realistically testing for it would be so rare...
+        slotschar = ["placeholder1", "placeholder2", "placeholder3", "placeholder4", "placeholder5", "<a:hutaoCash:1118473906915917935>"]
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''SELECT * FROM economy WHERE id = {discID}''')
+            results = cursor.fetchall()
+            if amount > results[0][1]:
+                await ctx.send("You do not have enough pekos!!!")
+                return
+            if amount < 1:
+                await ctx.send("You can't gamble 0 or negative pekos!!!")
+                return
+            cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+            cursor.execute(f'''UPDATE bank SET pekos = pekos + {amount}''')
+            conn.commit()
+            cursor.execute(f'''SELECT * FROM bank''')
+            bank = cursor.fetchall()
+            #print(bank[0][0], bank[0][1])
+            slotsresults = random.choices(slotschar, k=3)
+            await ctx.send("Slots Results!!!")
+            await ctx.send(f"{slotsresults[0]} {slotsresults[1]} {slotsresults[2]}")
+            #print(slotsresults[0], slotsresults[1], slotsresults[2])
+            #print(type(slotsresults[0]), type(slotsresults[1]), type(slotsresults[2]))
+            # print(1 == 1 == 1) returns true
+            if slotsresults[0] == slotsresults[1] == slotsresults[2]:
+                if slotsresults[0] == "<a:hutaoCash:1118473906915917935>":
+                    cursor.execute(f'''UPDATE economy SET pekos = pekos + {bank[0][1]} WHERE id = {discID}''')
+                    cursor.execute(f'''UPDATE bank SET pekos = 0''')
+                    conn.commit()
+                    slotsembed = discord.Embed(title="Slots", description="JACKPOT!!!", color=0xFF0000)
+                    slotsembed.add_field(name="pekos",value=f"+{bank[0][1]}")
+                    await ctx.send(embed=slotsembed)
+                    await ctx.send("<a:hutaoCash:1118473906915917935>")
+                else:
+                    cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                    conn.commit()
+                    slotsembed = discord.Embed(title="Slots", description="3 Matches!!!", color=0xFF0000)
+                    slotsembed.add_field(name="pekos",value=f"+{2*amount}")
+                    await ctx.send(embed=slotsembed)
+                    await ctx.send("<:Poggie:674427373440991232>")
+            elif slotsresults[0] == slotsresults[1] == "<a:hutaoCash:1118473906915917935>" or slotsresults[1] == slotsresults[2] == "<a:hutaoCash:1118473906915917935>" or slotsresults[0] == slotsresults[2] == "<a:hutaoCash:1118473906915917935>":
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                conn.commit()
+                slotsembed = discord.Embed(title="Slots", description="2 Jackpots!!!", color=0xFF0000)
+                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
+                await ctx.send(embed=slotsembed)
+                await ctx.send("<:Poggie:674427373440991232>")
+            elif slotsresults[0] == slotsresults[1] or slotsresults[1] == slotsresults[2] or slotsresults[0] == slotsresults[2]:
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                conn.commit()
+                slotsembed = discord.Embed(title="Slots", description="2 Matches!!!", color=0xFF0000)
+                slotsembed.add_field(name="pekos",value=f"+{amount}")
+                await ctx.send(embed=slotsembed)
+                await ctx.send("<a:umpsmug:710004835641983054>")
+            elif slotsresults[0] == "<a:hutaoCash:1118473906915917935>" or slotsresults[1] == "<a:hutaoCash:1118473906915917935>" or slotsresults[2] == "<a:hutaoCash:1118473906915917935>":
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                conn.commit()
+                slotsembed = discord.Embed(title="Slots", description="1 Jackpot!!!", color=0xFF0000)
+                slotsembed.add_field(name="pekos",value=f"+{amount}")
+                await ctx.send(embed=slotsembed)
+                await ctx.send("1 Jackpot!!! <a:umpsmug:710004835641983054>")
+            else:
+                await ctx.send("Unlucky")
+                await ctx.send("<:oddoneSmug:747346231595892766>")
+            conn.close()
+        else:
+            await ctx.send("Missing database")
+
+    @commands.command()
+    async def bank(self, ctx):
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute('''SELECT * FROM bank''')
+            bank = cursor.fetchall()
+            for x in range(len(bank)):
+                await ctx.send(f"Game: {bank[x][0]}, Bank: {bank[x][1]}")
 
     #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()

@@ -333,3 +333,25 @@ class adminplugin(commands.Cog):
             await ctx.send(f"{amount} pekos removed")
         else:
             await ctx.send("Missing database")
+
+    # TODO make this dynamically call different queries
+    @commands.is_owner()
+    @commands.command(name="cq")
+    async def CustomQuery(self, ctx, dbname:str):
+        '''Custom Query (cq)
+        This function will change to make one time query changes'''
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\{dbname}.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\{dbname}.db"))
+            cursor = conn.cursor()
+            dropquery = '''DROP TABLE bank'''
+            query = '''CREATE TABLE bank (id TEXT, pekos INTEGER)'''
+            insertquery = '''INSERT INTO bank VALUES (?,?)'''
+            insertdata = [("slots", 100)]
+            #cursor.execute(dropquery)
+            #cursor.execute(query)
+            #cursor.executemany(insertquery, insertdata)
+            #conn.commit()
+            #conn.close()
+            #await ctx.send("done")
+        else:
+            await ctx.send("missing Database")
