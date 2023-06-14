@@ -61,7 +61,8 @@ class economyplugin(commands.Cog):
     @commands.cooldown(1, 24*60*60, commands.BucketType.user)
     @commands.command(name='daily')
     async def daily(self, ctx):
-        '''Daily pekos'''
+        '''Daily pekos
+        Treasurebox = [50, 100, 500, 1000, 5000, 10000]'''
         discID = ctx.message.author.id
         discUser = await self.bot.fetch_user(discID)
         #print(discUser)
@@ -162,6 +163,11 @@ class economyplugin(commands.Cog):
                         conn.commit()
                         conn.close()
                         await ctx.send(f"You won {3*amount}!!!")
+                    else:
+                        cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                        conn.commit()
+                        conn.close()
+                        await ctx.send(f"You lost {amount}!!!")
                 elif multiplier == "5x" or multiplier == "5":
                     gambaresult = random.choices(outcomes, fivexweights)
                     if gambaresult[0] == "win":

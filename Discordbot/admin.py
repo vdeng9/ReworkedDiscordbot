@@ -126,6 +126,7 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.command()
     async def announce(self, ctx, *messages):
+        '''Makes announcements in bot channels'''
         for x in self.botchannels:
             channel = self.bot.get_channel(x)
             output = ''
