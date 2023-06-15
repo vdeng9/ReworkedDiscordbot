@@ -82,7 +82,7 @@ class economyplugin(commands.Cog):
                 pekosembed.set_author(name=str(discUser))
                 await ctx.send(embed=pekosembed)
             else:
-                await ctx.send("You might not be registered")
+                await ctx.send("You might not be registered, !register to register")
                 ctx.command.reset_cooldown(ctx)
         else:
             await ctx.send("Missing database")
@@ -95,7 +95,7 @@ class economyplugin(commands.Cog):
         if member is None:
             discID = ctx.message.author.id
             if not checkReg(discID=discID):
-                await ctx.send("You might not be registered")
+                await ctx.send("You might not be registered, !register to register")
                 return
         else:
             discID = member.id
@@ -120,10 +120,10 @@ class economyplugin(commands.Cog):
     @commands.command(name='gamba')
     async def gamba(self, ctx, amount: int, multiplier: str = None):
         '''Gamble your pekos
-        !gamba [amount]'''
+        !gamba [amount] [multiplier]'''
         discID = ctx.message.author.id
         if not checkReg(discID=discID):
-            await ctx.send("You might not be registered")
+            await ctx.send("You might not be registered, !register to register")
             return
         def check(m):
             return m.author == ctx.author
@@ -257,7 +257,7 @@ class economyplugin(commands.Cog):
         discID = ctx.message.author.id
         rdiscID = receiver.id
         if not checkReg(discID=discID):
-            await ctx.send("You might not be registered")
+            await ctx.send("You might not be registered, !register to register")
             return
         elif not checkReg(discID=rdiscID):
             await ctx.send("The receiver might not be registered")
@@ -293,7 +293,7 @@ class economyplugin(commands.Cog):
         !gacha | !gacha nsfw'''
         discID = ctx.message.author.id
         if not checkReg(discID=discID):
-            await ctx.send("You might not be registered")
+            await ctx.send("You might not be registered, !register to register")
             return
         if mode is None:
             baseurl = "http://api.waifu.im/search/?&is_nsfw=false"
@@ -331,7 +331,7 @@ class economyplugin(commands.Cog):
         tdiscID = target.id
         discName = await self.bot.fetch_user(discID)
         if not checkReg(discID=discID):
-            await ctx.send("You might not be registered")
+            await ctx.send("You might not be registered, !register to register")
             ctx.command.reset_cooldown(ctx)
             return
         if not checkReg(discID=tdiscID):
@@ -394,7 +394,7 @@ class economyplugin(commands.Cog):
     async def slots(self, ctx, amount: int):
         '''Slots
         !slots [amount]
-        2 matches = 1x, 3 matches = 5x, 1 jackpot = 1x, 2 jackpot = 3x, 3 jackpot = !bank'''
+        2 matches = 1x, 3 matches = 5x, 1 jackpot = 1x, 1 jackpot and 2 matches = 2x, 2 jackpot = 3x, 3 jackpot = !bank'''
         discID = ctx.message.author.id
         #test = ["<a:hutaoCash:1118473906915917935>"] # for testing 3 jackpots cuz realistically testing for it would be so rare...
         slotschar = ["<a:intoTheAyayaLand:1045225606352220190>", "<a:polkaSpin:797750618466287636>", "<:PekoSmug:797748881642356756>",
@@ -403,7 +403,7 @@ class economyplugin(commands.Cog):
                     "<a:HazmatMutsuki:786756436964933692>", "<a:ROWOW:704438082631630988>", "<:AYAYA:649470611843710976>", 
                     "<a:hutaoCash:1118473906915917935>"]
         if not checkReg(discID=discID):
-            await ctx.send("You might not be registered")
+            await ctx.send("You might not be registered, !register to register")
             ctx.command.reset_cooldown(ctx)
             return
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -452,6 +452,13 @@ class economyplugin(commands.Cog):
                 slotsembed.add_field(name="pekos",value=f"+{3*amount}")
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<:Poggie:674427373440991232>")
+            elif (slotsresults[0] == slotsresults[1] and slotsresults[2] == "<a:hutaoCash:1118473906915917935>") or (slotsresults[1] == slotsresults[2] and slotsresults[0] == "<a:hutaoCash:1118473906915917935>") or (slotsresults[0] == slotsresults[2] and slotsresults[1] == "<a:hutaoCash:1118473906915917935>"):
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                conn.commit()
+                slotsembed = discord.Embed(title="Slots", description="1 Jackpot and 2 Matches!!!", color=0xFF0000)
+                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
+                await ctx.send(embed=slotsembed)
+                await ctx.send("<:Poggie:674427373440991232>")
             elif slotsresults[0] == slotsresults[1] or slotsresults[1] == slotsresults[2] or slotsresults[0] == slotsresults[2]:
                 cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                 conn.commit()
@@ -477,6 +484,7 @@ class economyplugin(commands.Cog):
 
     @commands.command()
     async def bank(self, ctx):
+        '''Jackpot prize pool'''
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
