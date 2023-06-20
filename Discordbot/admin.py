@@ -355,3 +355,10 @@ class adminplugin(commands.Cog):
             #await ctx.send("done")
         else:
             await ctx.send("missing Database")
+
+    @commands.is_owner()
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        '''Test Cog based events'''
+        if message.content == "test":
+            await message.add_reaction("<:FaunaZoom:1098277887389483241>")

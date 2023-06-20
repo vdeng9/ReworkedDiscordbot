@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import requests
 import re, os, sys, random, sqlite3
 
@@ -218,3 +218,12 @@ class basicplugin(commands.Cog):
         webhooks = await ctx.channel.webhooks()
         for webhook in webhooks:
             await webhook.delete()
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.change_stat.start()
+
+    @tasks.loop(seconds=60)
+    async def change_stat(self):
+        vtuber, vtuberurl = random.choice(vtubers)
+        await self.bot.change_presence(activity=discord.Activity(name=vtuber, type=discord.ActivityType.watching, url=vtuberurl), status="dnd")

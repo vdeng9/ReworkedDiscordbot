@@ -472,7 +472,7 @@ class economyplugin(commands.Cog):
                 slotsembed = discord.Embed(title="Slots", description="1 Jackpot!!!", color=0xFF0000)
                 slotsembed.add_field(name="pekos",value=f"+{amount}")
                 await ctx.send(embed=slotsembed)
-                await ctx.send("1 Jackpot!!! <a:umpsmug:710004835641983054>")
+                await ctx.send("<a:umpsmug:710004835641983054>")
             else:
                 slotsembed = discord.Embed(title="Slots", description="Unlucky", color=0xFF0000)
                 slotsembed.add_field(name="pekos",value=f"+0")
@@ -492,6 +492,8 @@ class economyplugin(commands.Cog):
             bank = cursor.fetchall()
             for x in range(len(bank)):
                 await ctx.send(f"Game: {bank[x][0]}, Bank: {bank[x][1]}")
+        else:
+            await ctx.send("Missing database")
 
     #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()
