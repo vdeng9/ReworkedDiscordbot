@@ -223,7 +223,7 @@ class basicplugin(commands.Cog):
     async def on_ready(self):
         self.change_stat.start()
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(seconds=60*60)
     async def change_stat(self):
         vtuber, vtuberurl = random.choice(vtubers)
         await self.bot.change_presence(activity=discord.Activity(name=vtuber, type=discord.ActivityType.watching, url=vtuberurl), status="dnd")
