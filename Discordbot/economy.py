@@ -341,12 +341,11 @@ class economyplugin(commands.Cog):
         if discID == tdiscID:
             await ctx.send("Can't steal from yourself....")
             return
-        stealoutcomes = ["steal", "fail", "L"]
-        stealweights = [.35, .60, .05]
+        stealoutcomes = ["steal", "fail", "L", "MAD"]
+        stealweights = [.35, .60, .045, .005]
         #stealresult = random.choices(stealoutcomes, stealweights)
         #print(stealresult)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
-            x = 0
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
             cursor.execute(f'''SELECT * FROM economy WHERE id = {discID}''')
@@ -363,7 +362,7 @@ class economyplugin(commands.Cog):
                 await ctx.send("They must own at least 1 peko to steal")
                 ctx.command.reset_cooldown(ctx)
                 return
-            if amount <= 2*initresults[0][1]:
+            if amount <= 3*initresults[0][1]:
                 if amount <= tarresults[0][1]:
                     stealresult = random.choices(stealoutcomes, stealweights)
                     #print(stealresult)
@@ -380,11 +379,18 @@ class economyplugin(commands.Cog):
                         conn.commit()
                         conn.close()
                         await ctx.send(f"While trying to steal from {target}, {discName} tripped and fell dropping all {initresults[0][1]} of their pekos <:PepelaughW:674427223574446092>")
+                    elif stealresult[0] == "MAD":
+                        cursor.execute(f'''UPDATE economy SET pekos = 0 WHERE id = {discID}''')
+                        cursor.execute(f'''UPDATE economy SET pekos = 0 WHERE id = {tdiscID}''')
+                        conn.commit()
+                        conn.close()
+                        await ctx.send(f"{discName} tried to steal from {target} but {target} realized and fought back. They both punched the air for an hour while some hobo stole {initresults[0][1]} pekos from {discName} and {tarresults[0][1]} pekos from {target}")
+                        await ctx.send("<:worryhobo:1119108746652688494>")
                 else:
                     await ctx.send(f"They do not have {amount} pekos")
                     ctx.command.reset_cooldown(ctx)
             else:
-                await ctx.send("You can't steal more than 2 times the amount of pekos you own")
+                await ctx.send("You can't steal more than 3 times the amount of pekos you own")
                 ctx.command.reset_cooldown(ctx)
         else:
             await ctx.send("Missing database")
@@ -394,7 +400,7 @@ class economyplugin(commands.Cog):
     async def slots(self, ctx, amount: int):
         '''Slots
         !slots [amount]
-        2 matches = 1x, 3 matches = 5x, 1 jackpot = 1x, 1 jackpot and 2 matches = 2x, 2 jackpot = 3x, 3 jackpot = !bank'''
+        2 matches = 2x, 3 matches = 10x, 1 jackpot = 2x, 1 jackpot and 2 matches = 5x, 2 jackpot = 3x, 3 jackpot = !bank'''
         discID = ctx.message.author.id
         #test = ["<a:hutaoCash:1118473906915917935>"] # for testing 3 jackpots cuz realistically testing for it would be so rare...
         slotschar = ["<a:intoTheAyayaLand:1045225606352220190>", "<a:polkaSpin:797750618466287636>", "<:PekoSmug:797748881642356756>",
@@ -439,10 +445,10 @@ class economyplugin(commands.Cog):
                     await ctx.send(embed=slotsembed)
                     await ctx.send("<a:hutaoCash:1118473906915917935>")
                 else:
-                    cursor.execute(f'''UPDATE economy SET pekos = pekos + {5*amount} WHERE id = {discID}''')
+                    cursor.execute(f'''UPDATE economy SET pekos = pekos + {10*amount} WHERE id = {discID}''')
                     conn.commit()
                     slotsembed = discord.Embed(title="Slots", description="3 Matches!!!", color=0xFF0000)
-                    slotsembed.add_field(name="pekos",value=f"+{5*amount}")
+                    slotsembed.add_field(name="pekos",value=f"+{10*amount}")
                     await ctx.send(embed=slotsembed)
                     await ctx.send("<:Poggie:674427373440991232>")
             elif slotsresults[0] == slotsresults[1] == "<a:hutaoCash:1118473906915917935>" or slotsresults[1] == slotsresults[2] == "<a:hutaoCash:1118473906915917935>" or slotsresults[0] == slotsresults[2] == "<a:hutaoCash:1118473906915917935>":
@@ -453,24 +459,24 @@ class economyplugin(commands.Cog):
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<:Poggie:674427373440991232>")
             elif (slotsresults[0] == slotsresults[1] and slotsresults[2] == "<a:hutaoCash:1118473906915917935>") or (slotsresults[1] == slotsresults[2] and slotsresults[0] == "<a:hutaoCash:1118473906915917935>") or (slotsresults[0] == slotsresults[2] and slotsresults[1] == "<a:hutaoCash:1118473906915917935>"):
-                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {5*amount} WHERE id = {discID}''')
                 conn.commit()
                 slotsembed = discord.Embed(title="Slots", description="1 Jackpot and 2 Matches!!!", color=0xFF0000)
-                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
+                slotsembed.add_field(name="pekos",value=f"+{5*amount}")
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<:Poggie:674427373440991232>")
             elif slotsresults[0] == slotsresults[1] or slotsresults[1] == slotsresults[2] or slotsresults[0] == slotsresults[2]:
-                cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
                 conn.commit()
                 slotsembed = discord.Embed(title="Slots", description="2 Matches!!!", color=0xFF0000)
-                slotsembed.add_field(name="pekos",value=f"+{amount}")
+                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<a:umpsmug:710004835641983054>")
             elif slotsresults[0] == "<a:hutaoCash:1118473906915917935>" or slotsresults[1] == "<a:hutaoCash:1118473906915917935>" or slotsresults[2] == "<a:hutaoCash:1118473906915917935>":
-                cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
                 conn.commit()
                 slotsembed = discord.Embed(title="Slots", description="1 Jackpot!!!", color=0xFF0000)
-                slotsembed.add_field(name="pekos",value=f"+{amount}")
+                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<a:umpsmug:710004835641983054>")
             else:
@@ -495,6 +501,70 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
+    @commands.command(name="coinflip")
+    async def coinflip(self, ctx, mode: str = None, amount: int = None):
+        '''Flip a coin
+        You can play vs the coin with pve mode
+        !coinflip | !coinflip pve [amount]'''
+        discID = ctx.author.id
+        coinoutcomes = ["heads", "tails"]
+        headoptions = ["heads", "head", "h"]
+        tailoptions = ["tails", "tail", "t"]
+        weights = [.5,.5]
+        if mode is None and amount is None:
+            outcome = random.choices(coinoutcomes, weights)
+            await ctx.send(f"Coin landed on {outcome[0]}")
+        elif mode.lower() == "pve" and amount is not None:
+            outcome = random.choices(coinoutcomes, weights)
+            if not checkReg(discID=discID):
+                await ctx.send("You might not be registered, !register to register")
+                return
+            if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+                conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+                cursor = conn.cursor()
+                cursor.execute(f'''SELECT * FROM economy WHERE id = {discID}''')
+                results = cursor.fetchall()
+                if amount > results[0][1]:
+                    await ctx.send("You do not have enough pekos!!!")
+                    return
+                if amount < 1:
+                    await ctx.send("You can't gamble 0 or negative pekos!!!")
+                    return
+                await ctx.send(f"Heads or Tails?")
+                try:
+                    res = await self.bot.wait_for('message', timeout=10.0, check=lambda message: message.author == ctx.author)
+                except asyncio.TimeoutError:
+                    await ctx.send("no response")
+                else:
+                    if res.content.lower() in headoptions:
+                        cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                        conn.commit()
+                        if outcome[0] == "heads":
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"Coin landed on {outcome[0]} and you picked {res.content}, you won here is {2*amount} pekos")
+                        else:
+                            await ctx.send(f"Coin landed on {outcome[0]} and you picked {res.content}, you lost")
+                            conn.close()
+                    elif res.content.lower() in tailoptions:
+                        cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {discID}''')
+                        conn.commit()
+                        if outcome[0] == "tails":
+                            cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
+                            conn.commit()
+                            conn.close()
+                            await ctx.send(f"Coin landed on {outcome[0]} and you picked {res.content}, you won here is {2*amount} pekos")
+                        else:
+                            await ctx.send(f"Coin landed on {outcome[0]} and you picked {res.content}, you lost")
+                            conn.close()
+                    else:
+                        await ctx.send("Not a valid option")
+            else:
+                await ctx.send("Missing database")
+        else:
+            raise commands.BadArgument
+        
     #no longer needed but ima keep it incase future testing is needed for watever reason
     #@commands.is_owner()
     #@commands.command()
