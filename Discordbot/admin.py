@@ -9,7 +9,7 @@ import sqlite3
 import random
 import glob
 
-yess = ["yes", "y", "yea", "yeah", "ye", "yeh", "ya", "yah", "yur"]
+yess = ["yes", "y", "yea", "yeah", "ye", "yeh", "ya", "yah", "yur", "yar", "yuh"]
 nos = ["no", "n", "nope", "nah", "nur", "nar"]
 
 class adminplugin(commands.Cog):
@@ -99,9 +99,10 @@ class adminplugin(commands.Cog):
         else:
             if res.content.lower() in yess: 
                 if os.path.exists(os.path.join(sys.path[0], "downloaded")):
-                   folder = glob.glob(os.path.join(sys.path[0], "downloaded\\*"))
-                   for file in folder:
-                       os.remove(file)
+                    folder = glob.glob(os.path.join(sys.path[0], "downloaded\\*"))
+                    for file in folder:
+                       os.remove(file)   
+                    await ctx.send("done")
                 else:
                     await ctx.send("Folder DNE")
             elif res.content.lower() in nos:
