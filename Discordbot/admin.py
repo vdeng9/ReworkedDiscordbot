@@ -7,9 +7,10 @@ import string
 import asyncio
 import sqlite3
 import random
+import glob
 
-yess = ["yes", "y", "yea", "yeah", "ye", "yeh", "ya", "yah"]
-nos = ["no", "n", "nope", "nah"]
+yess = ["yes", "y", "yea", "yeah", "ye", "yeh", "ya", "yah", "yur"]
+nos = ["no", "n", "nope", "nah", "nur", "nar"]
 
 class adminplugin(commands.Cog):
     def __init__(self, bot):
@@ -85,6 +86,29 @@ class adminplugin(commands.Cog):
                 await ctx.send("ok...")
             else:
                 await ctx.send("something happened idk try again <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186>")
+
+    @commands.is_owner()
+    @commands.command(name='cleandl')
+    async def deldl(self, ctx, randomize: int = None):
+        '''Clean Download folder'''
+        await ctx.send("are you sure? yes or no")
+        try:
+            res = await self.bot.wait_for('message', timeout=20.0, check=lambda message: message.author == ctx.author)
+        except asyncio.TimeoutError:
+            await ctx.send("no response")
+        else:
+            if res.content.lower() in yess: 
+                if os.path.exists(os.path.join(sys.path[0], "downloaded")):
+                   folder = glob.glob(os.path.join(sys.path[0], "downloaded\\*"))
+                   for file in folder:
+                       os.remove(file)
+                else:
+                    await ctx.send("Folder DNE")
+            elif res.content.lower() in nos:
+                await ctx.send("ok...")
+            else:
+                await ctx.send("something happened idk try again <:worryshrug1:1097614392360698002><:worryshrug2:1097614441937371186>")
+
 
     @commands.is_owner()
     @commands.command(name="delmsg")
