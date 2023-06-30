@@ -303,8 +303,7 @@ class economyplugin(commands.Cog):
                 await ctx.send("Not a nsfw channel")
                 return
         else:
-            await ctx.send("Bad arguments")
-            return
+            raise commands.BadArgument
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
             cursor = conn.cursor()
@@ -341,8 +340,10 @@ class economyplugin(commands.Cog):
         if discID == tdiscID:
             await ctx.send("Can't steal from yourself....")
             return
-        stealoutcomes = ["steal", "fail", "L", "MAD"]
-        stealweights = [.35, .60, .045, .005]
+        # Mutual Assured Money feelsokayman
+        stealoutcomes = ["steal", "fail", "L", "MAD", "MAM"]
+        stealweights = [.35, .60, .04, .005, .005]
+        #stealweights = [0, 0, 0, 0, 1] # testweights
         #stealresult = random.choices(stealoutcomes, stealweights)
         #print(stealresult)
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -385,6 +386,14 @@ class economyplugin(commands.Cog):
                         conn.commit()
                         conn.close()
                         await ctx.send(f"{discName} tried to steal from {target} but {target} realized and fought back. They both punched the air for an hour while hobo bot Shademare12 stole {initresults[0][1]} pekos from {discName} and {tarresults[0][1]} pekos from {target}")
+                        await ctx.send("<:worryhobo:1119108746652688494>")
+                    elif stealresult[0] == "MAM":
+                        cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
+                        cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {tdiscID}''')
+                        conn.commit()
+                        conn.close()
+                        await ctx.send(f"{discName} stole {amount} from {target}")
+                        await ctx.send(f"While walking a hobo walked up to {target} and handed them {amount} pekos. \"This shit is worthless, take it!\" yelled the hobo as he walked away")
                         await ctx.send("<:worryhobo:1119108746652688494>")
                 else:
                     await ctx.send(f"They do not have {amount} pekos")

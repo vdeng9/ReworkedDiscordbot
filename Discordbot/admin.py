@@ -47,7 +47,9 @@ class adminplugin(commands.Cog):
     @commands.is_owner()
     @commands.command(name='dlimg')
     async def dlimg(self, ctx, randomize: int = None):
-        '''Downloads images from a channel'''
+        '''Downloads images from a channel
+        !dlimg | !dlimg 99 | !dlimg [anything]
+        '''
         image_types = ["png", "jpeg", "gif", "jpg", "mp4", "mov"]
         channel = ctx.channel
         incrementalname = 0
@@ -89,7 +91,7 @@ class adminplugin(commands.Cog):
 
     @commands.is_owner()
     @commands.command(name='cleandl')
-    async def deldl(self, ctx, randomize: int = None):
+    async def deldl(self, ctx):
         '''Clean Download folder'''
         await ctx.send("are you sure? yes or no")
         try:
