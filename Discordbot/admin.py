@@ -8,6 +8,7 @@ import asyncio
 import sqlite3
 import random
 import glob
+import datetime
 
 yess = ["yes", "y", "yea", "yeah", "ye", "yeh", "ya", "yah", "yur", "yar", "yuh"]
 nos = ["no", "n", "nope", "nah", "nur", "nar"]
@@ -389,3 +390,13 @@ class adminplugin(commands.Cog):
         '''Test Cog based events'''
         if message.content == "test":
             await message.add_reaction("<:FaunaZoom:1098277887389483241>")
+
+    @commands.is_owner()
+    @commands.Cog.listener()
+    async def on_command(self, ctx):
+        '''Command Logging'''
+        server = ctx.guild.name
+        user = ctx.author
+        userid = ctx.author.id
+        command = ctx.command
+        print(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Command: {command}")
