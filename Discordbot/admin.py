@@ -399,4 +399,5 @@ class adminplugin(commands.Cog):
         user = ctx.author
         userid = ctx.author.id
         command = ctx.command
-        print(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Command: {command}")
+        channel = ctx.channel
+        print(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}")
