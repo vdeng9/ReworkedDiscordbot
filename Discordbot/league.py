@@ -4,7 +4,6 @@ from discord.ext import commands
 import discord.utils
 import os
 import re
-import asyncio
 import requests
 
 opentxt = open(os.path.join(sys.path[0], "textfiles\\lolapitoken.txt"), "r")

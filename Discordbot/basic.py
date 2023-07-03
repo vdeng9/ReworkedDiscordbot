@@ -219,6 +219,22 @@ class basicplugin(commands.Cog):
         for webhook in webhooks:
             await webhook.delete()
 
+    @commands.command(name="slap")
+    async def slap(self, ctx):
+        discname = ctx.message.author
+        if ctx.message.reference is not None:
+            message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            recentmsg = message.author.id
+            dmtarget = await self.bot.fetch_user(recentmsg)
+            await ctx.send(f"You were slapped by {discname}")
+            await ctx.send("<:FaunaSlap:1098278238075224104>")
+        else:
+            message = [message async for message in ctx.channel.history(limit=2)]
+            recentmsg = message[1].author.id
+            dmtarget = await self.bot.fetch_user(recentmsg)
+            await dmtarget.send(f"You were slapped by {discname}")
+            await dmtarget.send("<:FaunaSlap:1098278238075224104>")
+
     @commands.Cog.listener()
     async def on_ready(self):
         self.change_stat.start()

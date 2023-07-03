@@ -1,6 +1,6 @@
 import discord
 import sys
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord.utils
 import os
 import string
@@ -395,9 +395,26 @@ class adminplugin(commands.Cog):
     @commands.Cog.listener()
     async def on_command(self, ctx):
         '''Command Logging'''
+        logchannel = self.bot.get_channel(1124538364973023295) # logging channel
         server = ctx.guild.name
         user = ctx.author
         userid = ctx.author.id
         command = ctx.command
         channel = ctx.channel
-        print(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}")
+        args = ctx.args
+        with open(os.path.join(sys.path[0], "logs\\log.txt"), 'a') as f:
+            f.writelines(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}, args: {args}\n")
+            f.close()
+        await logchannel.send(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}")
+        await logchannel.send(f"args: {args}")
+        #print(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}")
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.cleanlogs.start()
+
+    @tasks.loop(seconds=60*60*24)
+    async def cleanlogs(self):
+        '''Clean log.txt on the first of each month'''
+        if datetime.datetime.now().day == 1:
+            os.remove(os.path.join(sys.path[0], "logs\\log.txt"))
