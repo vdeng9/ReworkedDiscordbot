@@ -406,7 +406,7 @@ class adminplugin(commands.Cog):
             f.writelines(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}, args: {args}\n")
             f.close()
         await logchannel.send(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}")
-        await logchannel.send(f"args: {args}")
+        await logchannel.send(f"args: {args[2:]}")
         #print(f"{datetime.datetime.now()} User: {user}({userid}), Server: {server}, Channel: {channel}, Command: {command}")
 
     @commands.Cog.listener()

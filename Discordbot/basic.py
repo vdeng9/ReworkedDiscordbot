@@ -222,6 +222,8 @@ class basicplugin(commands.Cog):
     @commands.command(name="slap")
     async def slap(self, ctx):
         discname = ctx.message.author
+        server = ctx.guild.name
+        channel = ctx.channel
         if ctx.message.reference is not None:
             message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             recentmsg = message.author.id
@@ -232,7 +234,7 @@ class basicplugin(commands.Cog):
             message = [message async for message in ctx.channel.history(limit=2)]
             recentmsg = message[1].author.id
             dmtarget = await self.bot.fetch_user(recentmsg)
-            await dmtarget.send(f"You were slapped by {discname}")
+            await dmtarget.send(f"You were slapped by {discname}, in {server}:{channel}")
             await dmtarget.send("<:FaunaSlap:1098278238075224104>")
 
     @commands.Cog.listener()

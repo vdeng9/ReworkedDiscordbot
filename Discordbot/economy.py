@@ -296,9 +296,9 @@ class economyplugin(commands.Cog):
             await ctx.send("You might not be registered, !register to register")
             return
         if mode is None:
-            baseurl = "http://api.waifu.im/search/?&is_nsfw=false"
+            baseurl = "https://api.waifu.im/search/?is_nsfw=false"
         elif mode.lower() == "nsfw":
-            baseurl = "http://api.waifu.im/search/?&is_nsfw=true"
+            baseurl = "https://api.waifu.im/search/?is_nsfw=true"
             if not ctx.channel.is_nsfw():
                 await ctx.send("Not a nsfw channel")
                 return
