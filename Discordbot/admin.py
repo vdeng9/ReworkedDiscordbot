@@ -11,7 +11,7 @@ import glob
 import datetime
 
 yess = ["yes", "y", "yea", "yeah", "ye", "yeh", "ya", "yah", "yur", "yar", "yuh"]
-nos = ["no", "n", "nope", "nah", "nur", "nar"]
+nos = ["no", "n", "nope", "nah", "nur", "nar", "na"]
 
 class adminplugin(commands.Cog):
     def __init__(self, bot):
@@ -418,3 +418,14 @@ class adminplugin(commands.Cog):
         '''Clean log.txt on the first of each month'''
         if datetime.datetime.now().day == 1:
             os.remove(os.path.join(sys.path[0], "logs\\log.txt"))
+
+    def customcd(message):
+        cd = 24*60*60 - (datetime.datetime.now() - datetime.datetime.now().replace(hour=0,minute=0,second=0)).total_seconds()
+        return commands.Cooldown(1, cd)
+
+    @commands.is_owner()
+    @commands.dynamic_cooldown(customcd, commands.BucketType.user)
+    @commands.command(name="testdaily")
+    async def testdaily(self, ctx):
+        '''Test for uniform reset time'''
+        await ctx.send("+50 pukos")

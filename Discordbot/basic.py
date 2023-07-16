@@ -220,7 +220,10 @@ class basicplugin(commands.Cog):
             await webhook.delete()
 
     @commands.command(name="slap")
-    async def slap(self, ctx):
+    async def slap(self, ctx, user: discord.User = None):
+        '''Slap a mfer
+        !slap [User] | !slap | *reply* !slap
+        slap with no args slaps the person who sent the most recent message'''
         discname = ctx.message.author
         server = ctx.guild.name
         channel = ctx.channel
@@ -228,6 +231,9 @@ class basicplugin(commands.Cog):
             message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             recentmsg = message.author.id
             dmtarget = await self.bot.fetch_user(recentmsg)
+            await ctx.send(f"You were slapped by {discname}")
+            await ctx.send("<:FaunaSlap:1098278238075224104>")
+        elif user is not None:
             await ctx.send(f"You were slapped by {discname}")
             await ctx.send("<:FaunaSlap:1098278238075224104>")
         else:

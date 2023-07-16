@@ -7,6 +7,7 @@ import asyncio
 import requests
 import sqlite3
 import random
+import datetime
 
 def checkReg(discID: int):
     if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
@@ -58,10 +59,15 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.cooldown(1, 24*60*60, commands.BucketType.user)
+    def customcd(message):
+        cd = 24*60*60 - (datetime.datetime.now() - datetime.datetime.now().replace(hour=0,minute=0,second=0)).total_seconds()
+        return commands.Cooldown(1, cd)
+
+    @commands.dynamic_cooldown(customcd, commands.BucketType.user)
     @commands.command(name='daily')
     async def daily(self, ctx):
         '''Daily pekos
+        !daily
         Treasurebox = [50, 100, 500, 1000, 5000, 10000]'''
         discID = ctx.message.author.id
         discUser = await self.bot.fetch_user(discID)
