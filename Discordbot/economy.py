@@ -60,8 +60,10 @@ class economyplugin(commands.Cog):
             await ctx.send("Missing database")
 
     def customcd(message):
-        cd = 24*60*60 - (datetime.datetime.now() - datetime.datetime.now().replace(hour=0,minute=0,second=0)).total_seconds()
-        return commands.Cooldown(1, cd)
+        currenttime = datetime.datetime.now()
+        midnight = (currenttime + datetime.timedelta(days=1)).replace(hour=0,minute=0,second=0)
+        cd = midnight - currenttime
+        return commands.Cooldown(1, cd.total_seconds())
 
     @commands.dynamic_cooldown(customcd, commands.BucketType.user)
     @commands.command(name='daily')
