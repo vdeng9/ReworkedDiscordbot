@@ -248,7 +248,7 @@ class economyplugin(commands.Cog):
 
     @commands.command(name="lb", aliases=["leaderboard"])
     async def leaderboard(self, ctx):
-        '''Leaderboard'''
+        '''Leaderboard of top 25'''
         x = 0
         if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
             conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
@@ -330,6 +330,46 @@ class economyplugin(commands.Cog):
             waifuJSON = requests.get(baseurl).json()
             waifuimage = waifuJSON['images'][0]['url']
             await ctx.send(waifuimage)
+        else:
+            await ctx.send("Missing database")
+
+    @commands.cooldown(1,60)
+    @commands.command(name="batchgacha", aliases= ["batch"])
+    async def batchwaifugacha(self, ctx, mode:str = None):
+        '''Batch (10) gacha roll for 500 pekos
+        !batchgacha | !batchgacha nsfw | !batch | !batch nsfw'''
+        discID = ctx.message.author.id
+        if not checkReg(discID=discID):
+            await ctx.send("You might not be registered, !register to register")
+            return
+        if mode is None:
+            baseurl = "https://api.waifu.im/search/?is_nsfw=false"
+        elif mode.lower() == "nsfw":
+            baseurl = "https://api.waifu.im/search/?is_nsfw=true"
+            if not ctx.channel.is_nsfw():
+                await ctx.send("Not a nsfw channel")
+                ctx.command.reset_cooldown(ctx)
+                return
+        else:
+            raise commands.BadArgument
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''SELECT * FROM economy WHERE id = {discID}''')
+            results = cursor.fetchall()
+            if results[0][1] < 500:
+                await ctx.send("You do not have enough pekos")
+                ctx.command.reset_cooldown(ctx)
+                return
+            cursor.execute(f'''UPDATE economy SET pekos = pekos - 500 WHERE id = {discID}''')
+            conn.commit()
+            conn.close()
+            x = 0
+            while x < 10: 
+                x = x + 1
+                waifuJSON = requests.get(baseurl).json()
+                waifuimage = waifuJSON['images'][0]['url']
+                await ctx.send(waifuimage)
         else:
             await ctx.send("Missing database")
 
@@ -526,7 +566,7 @@ class economyplugin(commands.Cog):
     async def coinflip(self, ctx, mode: str = None, amount: int = None):
         '''Flip a coin
         You can play vs the coin with pve mode
-        !coinflip | !coinflip pve [amount]'''
+        !coinflip | !coinflip pve [amount] | !cf | !cd pve [amount]'''
         discID = ctx.author.id
         coinoutcomes = ["heads", "tails"]
         headoptions = ["heads", "head", "h"]
