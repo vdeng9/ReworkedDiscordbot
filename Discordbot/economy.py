@@ -59,13 +59,17 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    def customcd(message):
-        currenttime = datetime.datetime.now()
-        midnight = (currenttime + datetime.timedelta(days=1)).replace(hour=0,minute=0,second=0)
-        cd = midnight - currenttime
-        return commands.Cooldown(1, cd.total_seconds())
+    #def dailycustomcd(message):
+    #    print(f"Caller = {message.author}({message.author.id})")
+    #    currenttime = datetime.datetime.now()
+    #    print(f"currenttime = {currenttime}")
+    #    midnight = (currenttime + datetime.timedelta(days=1)).replace(hour=0,minute=0,second=0,microsecond=0)
+    #    print(f"midnight = {midnight}")
+    #    cd = midnight - currenttime
+    #    print(f"cd = {cd}")
+    #    return commands.Cooldown(1, cd.total_seconds())
 
-    @commands.dynamic_cooldown(customcd, commands.BucketType.user)
+    @commands.cooldown(1, 24*60*60, commands.BucketType.user)
     @commands.command(name='daily')
     async def daily(self, ctx):
         '''Daily pekos
@@ -329,7 +333,7 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.cooldown(1,10*60,commands.BucketType.user)
+    @commands.cooldown(1, 8*60*60, commands.BucketType.user)
     @commands.command(name="steal")
     async def stealpekos(self, ctx, target: discord.User, amount: int):
         '''Steal up to 2x pekos you own
@@ -518,7 +522,7 @@ class economyplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
-    @commands.command(name="coinflip")
+    @commands.command(name="coinflip", aliases = ['cf'])
     async def coinflip(self, ctx, mode: str = None, amount: int = None):
         '''Flip a coin
         You can play vs the coin with pve mode
