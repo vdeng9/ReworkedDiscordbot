@@ -362,6 +362,28 @@ class adminplugin(commands.Cog):
         else:
             await ctx.send("Missing database")
 
+    @commands.is_owner()
+    @commands.command(name="tax")
+    async def taxbank(self, ctx, amount: float):
+        '''Removes pekos from bank'''
+        if amount > .5 or amount < 0:
+            await ctx.send("out of range(0-0.5)")
+            return
+        if os.path.exists(os.path.join(sys.path[0], f"databases\\econ.db")):
+            conn = sqlite3.connect(os.path.join(sys.path[0], f"databases\\econ.db"))
+            cursor = conn.cursor()
+            cursor.execute(f'''SELECT pekos FROM bank''')
+            result = cursor.fetchall()
+            #print(result[0][0])
+            #print(int(amount*result[0][0]))
+            cursor.execute(f'''UPDATE bank SET pekos = pekos - {int(amount*result[0][0])}''')
+            conn.commit()
+            conn.close()
+            await ctx.send(f"taxed {amount*100}% ({int(amount*result[0][0])}) from the bank")
+            await ctx.send("<a:fubukino:1205735270562136094>")
+        else:
+            await ctx.send("Missing database")
+
     # TODO make this dynamically call different queries
     @commands.is_owner()
     @commands.command(name="cq")

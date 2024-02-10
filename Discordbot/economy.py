@@ -261,6 +261,7 @@ class economyplugin(commands.Cog):
                 resultembed.add_field(name=f"#{rank} {str(await self.bot.fetch_user(results[x][0]))}", value=f"{results[x][1]} pekos", inline=True)
                 x += 1
             await ctx.send(embed=resultembed)
+            conn.close()
 
     @commands.command(name="give")
     async def givepekos(self, ctx, receiver: discord.User, amount: int):
@@ -381,6 +382,9 @@ class economyplugin(commands.Cog):
         !steal [target] [amount]'''
         discID = ctx.message.author.id
         tdiscID = target.id
+        #print(tdiscID)
+        #print(type(tdiscID))
+        #print(type(target.id))
         discName = await self.bot.fetch_user(discID)
         if not checkReg(discID=discID):
             await ctx.send("You might not be registered, !register to register")
@@ -396,6 +400,7 @@ class economyplugin(commands.Cog):
         # Mutual Assured Money feelsokayman
         stealoutcomes = ["steal", "fail", "L", "MAD", "MAM"]
         stealweights = [.30, .64, .04, .005, .015]
+        #riggedweights = [0, 1, 0, 0, 0, 0]
         #stealweights = [0, 0, 0, 0, 1] # testweights
         #stealresult = random.choices(stealoutcomes, stealweights)
         #print(stealresult)
@@ -418,17 +423,14 @@ class economyplugin(commands.Cog):
                 return
             if amount <= 3*initresults[0][1]:
                 if amount <= tarresults[0][1]:
-                    if tdiscID == 192820182119350272:
-                        stealresult = "fail"
-                    else:
-                        stealresult = random.choices(stealoutcomes, stealweights)
-                    print(stealresult)
+                    stealresult = random.choices(stealoutcomes, stealweights)
+                    #print(stealresult)
                     if stealresult[0] == "steal":                            
                         cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                         cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {tdiscID}''')
                         conn.commit()
                         conn.close()
-                        await ctx.send(f"{discName} stole {amount} from {target}")
+                        await ctx.send(f"{discName} stole {amount} from {target} <a:yoink:1138272962345177170>")
                     elif stealresult[0] == "fail":
                         await ctx.send(f"{discName} failed to steal from {target} <:PepelaughW:674427223574446092>")
                     elif stealresult[0] == "L":

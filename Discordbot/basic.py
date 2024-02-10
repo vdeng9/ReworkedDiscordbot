@@ -30,12 +30,14 @@ class basicplugin(commands.Cog):
         await ctx.send(totalsum)
 
     @commands.command()
-    async def sub(self, ctx, *args):
+    async def sub(self, ctx, first ,*args):
         '''Subtraction'''
-        totaldiff = 0
+        totaldiff = float(first)
         for num in args:
+            #print(num)
             convertedStrToFloat = float(num)
             totaldiff -= convertedStrToFloat
+        #print(totaldiff)
         await ctx.send(totaldiff)
 
     @commands.command()
