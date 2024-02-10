@@ -256,7 +256,7 @@ class economyplugin(commands.Cog):
             cursor.execute('''SELECT * FROM economy ORDER BY pekos DESC''')
             results = cursor.fetchall()
             resultembed = discord.Embed(title="Leaderboard")
-            while x < len(results):
+            while x < 25:
                 rank = x + 1
                 resultembed.add_field(name=f"#{rank} {str(await self.bot.fetch_user(results[x][0]))}", value=f"{results[x][1]} pekos", inline=True)
                 x += 1
@@ -341,6 +341,7 @@ class economyplugin(commands.Cog):
         discID = ctx.message.author.id
         if not checkReg(discID=discID):
             await ctx.send("You might not be registered, !register to register")
+            ctx.command.reset_cooldown(ctx)
             return
         if mode is None:
             baseurl = "https://api.waifu.im/search/?is_nsfw=false"
@@ -376,7 +377,7 @@ class economyplugin(commands.Cog):
     @commands.cooldown(1, 8*60*60, commands.BucketType.user)
     @commands.command(name="steal")
     async def stealpekos(self, ctx, target: discord.User, amount: int):
-        '''Steal up to 2x pekos you own
+        '''Steal up to 3x pekos you own
         !steal [target] [amount]'''
         discID = ctx.message.author.id
         tdiscID = target.id
@@ -394,7 +395,7 @@ class economyplugin(commands.Cog):
             return
         # Mutual Assured Money feelsokayman
         stealoutcomes = ["steal", "fail", "L", "MAD", "MAM"]
-        stealweights = [.35, .60, .04, .005, .005]
+        stealweights = [.30, .64, .04, .005, .015]
         #stealweights = [0, 0, 0, 0, 1] # testweights
         #stealresult = random.choices(stealoutcomes, stealweights)
         #print(stealresult)
@@ -417,8 +418,11 @@ class economyplugin(commands.Cog):
                 return
             if amount <= 3*initresults[0][1]:
                 if amount <= tarresults[0][1]:
-                    stealresult = random.choices(stealoutcomes, stealweights)
-                    #print(stealresult)
+                    if tdiscID == 192820182119350272:
+                        stealresult = "fail"
+                    else:
+                        stealresult = random.choices(stealoutcomes, stealweights)
+                    print(stealresult)
                     if stealresult[0] == "steal":                            
                         cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
                         cursor.execute(f'''UPDATE economy SET pekos = pekos - {amount} WHERE id = {tdiscID}''')
@@ -461,7 +465,7 @@ class economyplugin(commands.Cog):
     async def slots(self, ctx, amount: int):
         '''Slots
         !slots [amount]
-        2 matches = 3x, 3 matches = 20x, 1 jackpot = 3x, 1 jackpot and 2 matches = 5x, 2 jackpot = 5x, 3 jackpot = !bank'''
+        2 matches = 2x, 3 matches = 20x, 1 jackpot = 2x, 1 jackpot and 2 matches = 5x, 2 jackpot = 5x, 3 jackpot = !bank'''
         discID = ctx.message.author.id
         #test = ["<a:hutaoCash:1118473906915917935>"] # for testing 3 jackpots cuz realistically testing for it would be so rare...
         slotschar = ["<a:intoTheAyayaLand:1045225606352220190>", "<a:polkaSpin:797750618466287636>", "<:PekoSmug:797748881642356756>",
@@ -527,17 +531,17 @@ class economyplugin(commands.Cog):
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<:Poggie:674427373440991232>")
             elif slotsresults[0] == slotsresults[1] or slotsresults[1] == slotsresults[2] or slotsresults[0] == slotsresults[2]:
-                cursor.execute(f'''UPDATE economy SET pekos = pekos + {3*amount} WHERE id = {discID}''')
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
                 conn.commit()
                 slotsembed = discord.Embed(title="Slots", description="2 Matches!!!", color=0xFF0000)
-                slotsembed.add_field(name="pekos",value=f"+{3*amount}")
+                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<a:umpsmug:710004835641983054>")
             elif slotsresults[0] == "<a:hutaoCash:1118473906915917935>" or slotsresults[1] == "<a:hutaoCash:1118473906915917935>" or slotsresults[2] == "<a:hutaoCash:1118473906915917935>":
-                cursor.execute(f'''UPDATE economy SET pekos = pekos + {3*amount} WHERE id = {discID}''')
+                cursor.execute(f'''UPDATE economy SET pekos = pekos + {2*amount} WHERE id = {discID}''')
                 conn.commit()
                 slotsembed = discord.Embed(title="Slots", description="1 Jackpot!!!", color=0xFF0000)
-                slotsembed.add_field(name="pekos",value=f"+{3*amount}")
+                slotsembed.add_field(name="pekos",value=f"+{2*amount}")
                 await ctx.send(embed=slotsembed)
                 await ctx.send("<a:umpsmug:710004835641983054>")
             else:

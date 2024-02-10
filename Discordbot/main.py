@@ -3,7 +3,7 @@ import asyncio
 from discord.ext import commands
 import os, sys
 
-import admin, music, basic, league, economy
+import admin, basic, league, economy, music
 
 async def command_error(ctx, exc):
     exc_type = type(exc)

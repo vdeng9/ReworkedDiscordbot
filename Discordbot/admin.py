@@ -152,7 +152,7 @@ class adminplugin(commands.Cog):
 
     botchannels = [712157790751424513, 692490698955423786]
     @commands.is_owner()
-    @commands.command()
+    @commands.command(aliases=["a"])
     async def announce(self, ctx, *messages):
         '''Makes announcements in bot channels'''
         for x in self.botchannels:
