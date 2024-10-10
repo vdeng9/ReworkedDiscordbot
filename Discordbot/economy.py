@@ -447,7 +447,6 @@ class economyplugin(commands.Cog):
                         await ctx.send("<:worryhobo:1119108746652688494>")
                     elif stealresult[0] == "MAM":
                         cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {discID}''')
-                        cursor.execute(f'''UPDATE economy SET pekos = pekos + {amount} WHERE id = {tdiscID}''')
                         conn.commit()
                         conn.close()
                         await ctx.send(f"{discName} stole {amount} from {target}")
@@ -474,7 +473,7 @@ class economyplugin(commands.Cog):
                     "<:painpeko:854652380158230528>", "<:whenlifegetsscuffed:933325588003967056>", "<:FaunaStare:1074027074391646278>",
                     "<:oddowo:741191279945449532>", "<:smadge:1039443341038850109>", "<a:rainbowpls:703162735256535120>",
                     "<a:HazmatMutsuki:786756436964933692>", "<a:ROWOW:704438082631630988>", "<:AYAYA:649470611843710976>", 
-                    "<a:hutaoCash:1118473906915917935>"]
+                    "<a:fubukino:1205735270562136094>", "<:MumeiPanic:1123867690126295070>", "<a:hutaoCash:1118473906915917935>"]
         if not checkReg(discID=discID):
             await ctx.send("You might not be registered, !register to register")
             ctx.command.reset_cooldown(ctx)
